@@ -68,7 +68,8 @@ def push_to_index(entry: os.DirEntry, root_path: str, index_name: str):
         'size': bytes_to_human_readable(stats.st_size),
         'mime_type': mime_type,
         'modified': datetime.fromtimestamp(stats.st_mtime, tz=timezone.utc),
-        'created': datetime.fromtimestamp(stats.st_ctime, tz=timezone.utc)
+        'created': datetime.fromtimestamp(stats.st_ctime, tz=timezone.utc),
+        'last_indexed': datetime.now()
     }
 
     response = client.index(
