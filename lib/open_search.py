@@ -57,6 +57,7 @@ def push_to_index(entry: os.DirEntry, root_path: str, index_name: str):
     relative_path = entry.path[len(root_path) + 1:]
 
     guess = filetype.guess(entry.path)
+    
     if guess is not None:
         mime_type = guess.mime
     else:
@@ -65,7 +66,8 @@ def push_to_index(entry: os.DirEntry, root_path: str, index_name: str):
     document = {
         'name': entry.name,
         'path': relative_path,
-        'bytes': stats.st_size,
+        'size_bytes': stats.st_size,
+        'size': bytes_to_human_readable(stats.st_size),
         'mime_type': mime_type,
         'modified': datetime.fromtimestamp(stats.st_mtime, tz=timezone.utc),
         'created': datetime.fromtimestamp(stats.st_ctime, tz=timezone.utc)
@@ -110,3 +112,16 @@ def push_batch(docs, index_name):
         client,
         data
     )
+def bytes_to_human_readable(number: int, suffix="B"):
+    
+    notations = ["B", "KB", "MB", "GB"]
+
+    counter = 0
+    while (counter < len(notations)):
+        if number < 1000:
+            return f"{number} {notations[counter]}" 
+        
+        number = round(number * 0.0009765625, 2)
+        counter += 1
+
+    return f"{number} {notations[:-1]}"
