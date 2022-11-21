@@ -27,19 +27,17 @@ def create_index(index_name):
             "mappings":{
                 "properties":{
                     "created":{
-                        "type":"date",
-                        "format": "strict_date_optional_time||epoch_millis"
+                        "type":"date"
                     },
                     "modified":{
-                        "type": "date",
-                        "format": "strict_date_optional_time||epoch_millis"
+                        "type": "date"
                     },
                     "indexed": {
                         "type": "date"
                     },
                     "size": {
                         "type": "long"
-                    }
+                    },
                 }
             }
         }
