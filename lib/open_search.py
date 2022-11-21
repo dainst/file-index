@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 from opensearchpy import OpenSearch, helpers
 from opensearchpy.exceptions import RequestError
+
+import filetype
 import os
 
 password = os.environ.get('FILE_INDEX_PASSWORD')
@@ -54,10 +56,17 @@ def push_to_index(entry: os.DirEntry, root_path: str, index_name: str):
 
     relative_path = entry.path[len(root_path) + 1:]
 
+    guess = filetype.guess(entry.path)
+    if guess is not None:
+        mime_type = guess.mime
+    else:
+        mime_type = None
+
     document = {
         'name': entry.name,
         'path': relative_path,
         'bytes': stats.st_size,
+        'mime_type': mime_type,
         'modified': datetime.fromtimestamp(stats.st_mtime, tz=timezone.utc),
         'created': datetime.fromtimestamp(stats.st_ctime, tz=timezone.utc)
     }
