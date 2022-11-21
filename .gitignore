@@ -1,5 +1,6 @@
 .venv/
 .env
 opensearch-data/
+opensearch-security/internal_users.yml
 
 __pycache__
