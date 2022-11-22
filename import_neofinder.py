@@ -8,7 +8,7 @@ import os
 from lib import open_search
 
 SIZE_PATTERN_PLAIN_BYTE_VALUE = r"^\d+$"
-SIZE_PATTERN_VARIANT_1 = r"^.+\(([\d\.])+ Bytes\)$" # "481,6 KB (481.631 Bytes)"
+SIZE_PATTERN_VARIANT_1 = r"^.+\(([\d\.]+) Bytes\)$" # "481,6 KB (481.631 Bytes)"
 
 
 HEADING_MAPPING = {
@@ -63,7 +63,7 @@ def parse_size_in_bytes(neofinder_value):
 
     m = re.match(SIZE_PATTERN_VARIANT_1, neofinder_value)
     if m:
-        return int(m.group(1).strip('.'))
+        return int(m.group(1).replace('.', ''))
         
     print(f"Unable to match neofinder size value {neofinder_value}.")
 
