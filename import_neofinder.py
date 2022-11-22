@@ -76,7 +76,8 @@ def process_values(values):
 
     modified_standardized = dateparser.parse(values['modified'], date_formats=DATE_FORMATS)
     if not modified_standardized:
-        print(f"Unable to parse modification date for {values['path']}: '{values['modified']}'")
+        if values['modified'] != "-":
+            print(f"Unable to parse modification date for {values['path']}: '{values['modified']}'")
     
     created_standardized = dateparser.parse(values['created'], date_formats=DATE_FORMATS)
     if not created_standardized:
@@ -85,6 +86,9 @@ def process_values(values):
             print(f"Unable to parse creation date for {values['path']}: '{values['created']}'")
         else:
             created_standardized = modified_standardized
+
+    if not values["created"] and not values["modified"]:
+        print(f"Neither creation nor modification date for {values['path']}")
 
     values['neofinder_created'] = values["created"]
     values['neofinder_modified'] = values["modified"]
