@@ -31,6 +31,9 @@ def create_index(index_name):
                     "modified":{
                         "type": "date",
                         "format": "strict_date_optional_time||epoch_millis"
+                    },
+                    "indexed": {
+                        "type": "date"
                     }
                 }
             }
@@ -64,3 +67,16 @@ def push_to_index(entry: os.DirEntry, root_path: str, index_name: str):
     )
 
     print(f'Adding document: {relative_path}')
+
+def push_to_index_b(data, index_name):
+
+    data["indexed"] = datetime.now()
+
+    # TODO: Menschen lesbare size
+
+    response = client.index(
+        index = index_name,
+        body = data,
+        id = data["path"],
+        refresh = True
+    )
