@@ -95,6 +95,9 @@ def process_values(values):
 
 
 def process_file(path, index_name):
+
+    batch_size = 1000
+
     with open(path, 'r') as csv_file:
         line = csv_file.readline()
         headings = line.split('\t')
@@ -102,6 +105,7 @@ def process_file(path, index_name):
         headings = standardize_headings(headings)
 
         line_counter = 0
+        batch = []
         while(line):
             line = csv_file.readline()
     
@@ -109,10 +113,14 @@ def process_file(path, index_name):
             if len(values) == len(headings):
                 processed = process_values(dict(zip(headings, values)))
 
-                open_search.push_to_index_b(processed, index_name)
+                batch.append(processed)
+
+                # open_search.push_to_index_b(processed, index_name)
                 line_counter += 1
 
-                if line_counter % 1000 == 0:
+                if len(batch) == batch_size:
+                    open_search.push_batch(batch, index_name)
+                    batch = []
                     print(f"  processed {line_counter}")
 
 index_name = "neo_finder"

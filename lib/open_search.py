@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from opensearchpy import OpenSearch
+from opensearchpy import OpenSearch, helpers
 from opensearchpy.exceptions import RequestError
 import os
 
@@ -79,4 +79,22 @@ def push_to_index_b(data, index_name):
         body = data,
         id = data["path"],
         refresh = True
+    )
+
+def push_batch(docs, index_name):
+
+    data = []
+
+    for doc in docs:
+        doc["indexed"] = datetime.now()
+        data.append({
+            '_op_type': 'index',
+            '_index': index_name,
+            '_id': doc["path"],
+            '_source': doc
+        })
+    
+    response = helpers.bulk(
+        client,
+        data
     )
