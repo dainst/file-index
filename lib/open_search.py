@@ -34,6 +34,9 @@ def create_index(index_name):
                     },
                     "indexed": {
                         "type": "date"
+                    },
+                    "size": {
+                        "type": "long"
                     }
                 }
             }

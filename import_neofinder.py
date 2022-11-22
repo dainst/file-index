@@ -7,7 +7,9 @@ import os
 
 from lib import open_search
 
-CATALOG_REGEX = r"Name:? (.+)"
+SIZE_PATTERN_PLAIN_BYTE_VALUE = r"^\d+$"
+SIZE_PATTERN_VARIANT_1 = r"^.+\(([\d\.])+ Bytes\)$" # "481,6 KB (481.631 Bytes)"
+
 
 HEADING_MAPPING = {
     "name": ["Name"],
@@ -54,6 +56,18 @@ def standardize_headings(headings):
 
     return standardized
 
+def parse_size_in_bytes(neofinder_value):
+
+    if re.match(SIZE_PATTERN_PLAIN_BYTE_VALUE, neofinder_value):
+        return int(neofinder_value)
+
+    m = re.match(SIZE_PATTERN_VARIANT_1, neofinder_value)
+    if m:
+        return int(m.group(1).strip('.'))
+        
+    print(f"Unable to match neofinder size value {neofinder_value}.")
+
+
 
 def process_values(values):
 
@@ -86,6 +100,9 @@ def process_values(values):
         values["type"] = "directory"
     else:
         values["type"] = "file"
+
+    values["neofinder_size"] = values["size"]
+    values["size"] = parse_size_in_bytes(values["size"])
 
     guessed_mimetype = mimetypes.guess_type(values["name"], strict=False)
     if guessed_mimetype[0]:
