@@ -91,7 +91,7 @@ def push_batch(docs, index_name):
             '_op_type': 'index',
             '_index': index_name,
             '_id': doc["path"],
-            '_source': doc
+            '_source': dict(sorted(doc.items()))
         })
     
     response = helpers.bulk(
