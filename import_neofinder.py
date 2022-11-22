@@ -97,7 +97,7 @@ def process_values(values):
     values["modified"] = modified_standardized
 
     values["neofinder_path"] = values["path"]
-    values["path"] = values["path"].lstrip(f"{values['neofinder_catalog']}") 
+    values["path"] = values["path"].lstrip(f"{values['neofinder_catalog']}:") 
     values["path"] = values["path"].replace(":", "/")
 
     values["neofinder_type"] = values["type"]
