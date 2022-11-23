@@ -144,6 +144,10 @@ def process_file(path, index_name):
                     open_search.push_batch(batch, index_name)
                     batch = []
                     print(f"  processed {line_counter}")
+        
+        if len(batch) > 0:
+            open_search.push_batch(batch, index_name)
+            print(f"  processed {line_counter}")
 
 index_name = "neo_finder"
 
