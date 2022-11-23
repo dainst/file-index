@@ -108,10 +108,13 @@ def push_batch(docs, index_name):
             '_source': dict(sorted(doc.items()))
         })
     
-    response = helpers.bulk(
+    (successes, errors) = helpers.bulk(
         client,
         data
     )
+
+    if successes != len(docs):
+        raise Exception(errors)
 
 def bytes_to_human_readable(number: int):
     
