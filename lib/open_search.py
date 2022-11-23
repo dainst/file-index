@@ -122,7 +122,7 @@ def bytes_to_human_readable(number: int):
         if number < 1000:
             return f"{number} {notations[counter]}" 
         
-        number = round(number * 0.0009765625, 2)
+        number = round(number * 0.001, 2)
         counter += 1
 
     return f"{number} {notations[:-1]}"
