@@ -14,7 +14,7 @@ SIZE_PATTERN_VARIANT_1 = r"^.+\(([\d\.]+) Bytes\)$" # "481,6 KB (481.631 Bytes)"
 HEADING_MAPPING = {
     "name": ["Name"],
     "path": ["Pfad"],
-    "size": ["Größe"],
+    "size_bytes": ["Größe"],
     "created": ["Erstelldatum"],
     "modified": ["Änderungsdatum"],
     "type": ["Art"],
@@ -106,8 +106,8 @@ def process_values(values):
     else:
         values["type"] = "file"
 
-    values["neofinder_size"] = values["size"]
-    values["size"] = parse_size_in_bytes(values["size"])
+    values["neofinder_size"] = values["size_bytes"]
+    values["size_bytes"] = parse_size_in_bytes(values["size_bytes"])
 
     guessed_mimetype = mimetypes.guess_type(values["name"], strict=False)
     if guessed_mimetype[0]:

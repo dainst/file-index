@@ -35,7 +35,7 @@ def create_index(index_name):
                     "indexed": {
                         "type": "date"
                     },
-                    "size": {
+                    "size_bytes": {
                         "type": "long"
                     },
                 }
@@ -100,6 +100,7 @@ def push_batch(docs, index_name):
 
     for doc in docs:
         doc["indexed"] = datetime.now()
+        doc["size"] = bytes_to_human_readable(doc["size_bytes"])
         data.append({
             '_op_type': 'index',
             '_index': index_name,
@@ -111,7 +112,8 @@ def push_batch(docs, index_name):
         client,
         data
     )
-def bytes_to_human_readable(number: int, suffix="B"):
+
+def bytes_to_human_readable(number: int):
     
     notations = ["B", "KB", "MB", "GB"]
 
