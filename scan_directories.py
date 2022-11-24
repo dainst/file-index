@@ -79,4 +79,4 @@ walk_file_system(root_dir, root_dir, target_index)
 
 if len(batch) > 0:
     open_search.push_batch(batch, target_index)
-    print(f" processed {counter}")
+    print(f" processed {counter} overall")
