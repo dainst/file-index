@@ -13,44 +13,48 @@ def walk_file_system(current, root_path, target_index):
     global counter
 
     subdirs = []
-    for f in os.scandir(current):
-        stats = f.stat()
+    try:
+        for f in os.scandir(current):
+            stats = f.stat()
 
-        relative_path = f.path[len(root_path) + 1:]
-        document = {
-            'name': f.name,
-            'path': relative_path,
-            'size_bytes': stats.st_size,
-            'modified': datetime.fromtimestamp(stats.st_mtime, tz=timezone.utc),
-            'created': datetime.fromtimestamp(stats.st_ctime, tz=timezone.utc),
-        }
+            relative_path = f.path[len(root_path) + 1:]
+            document = {
+                'name': f.name,
+                'path': relative_path,
+                'size_bytes': stats.st_size,
+                'modified': datetime.fromtimestamp(stats.st_mtime, tz=timezone.utc),
+                'created': datetime.fromtimestamp(stats.st_ctime, tz=timezone.utc),
+            }
 
-        if f.is_dir():
-            subdirs.append(f.path)
-            document['type'] = "directory"
-        else:
-            document['type'] = "file"
+            if f.is_dir():
+                subdirs.append(f.path)
+                document['type'] = "directory"
+            else:
+                document['type'] = "file"
 
-            try:
-                guess = filetype.guess(f.path)
-            except PermissionError:
-                guess = None
-            second_guess = mimetypes.guess_type(f.name, strict=False)
-            if guess is not None:
-                document["mime_type"] = guess.mime
-            elif second_guess[0]:
-                document["mime_type"] = second_guess[0]
+                guess = mimetypes.guess_type(f.name, strict=False)
+                if guess[0]:
+                    document["mime_type"] = guess[0]
+                else:
+                    try:
+                        guess = filetype.guess(f.path) # fallback peeks into file and tries to decide by content
+                    except PermissionError:
+                        guess = None
+                    if guess:
+                        document["mime_type"] = guess.mime
 
-        batch.append(document)
-        counter += 1
+            batch.append(document)
+            counter += 1
 
-    if len(batch) > 100000:
-        open_search.push_batch(batch, target_index)
-        print(f" processed {counter}")
-        batch = []
+        if len(batch) > 100000:
+            print(f" processed {counter}, pushing to index...")
+            open_search.push_batch(batch, target_index)
+            batch = []
 
-    for subdir in subdirs:
-        walk_file_system(subdir, root_dir, target_index)
+        for subdir in subdirs:
+            walk_file_system(subdir, root_dir, target_index)
+    except PermissionError:
+        print(f"PermissionError for {current}, ignoring...")
 
     
 
