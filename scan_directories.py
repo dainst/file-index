@@ -8,6 +8,8 @@ import lib.open_search as open_search
 
 batch = []
 counter = 0
+
+
 def walk_file_system(current, root_path, target_index):
     global batch
     global counter
@@ -15,36 +17,47 @@ def walk_file_system(current, root_path, target_index):
     subdirs = []
     try:
         for f in os.scandir(current):
-            stats = f.stat()
 
             relative_path = f.path[len(root_path) + 1:]
             document = {
                 'name': f.name,
-                'path': relative_path,
-                'size_bytes': stats.st_size,
-                'modified': datetime.fromtimestamp(stats.st_mtime, tz=timezone.utc),
-                'created': datetime.fromtimestamp(stats.st_ctime, tz=timezone.utc),
+                'path': relative_path
             }
 
-            if f.is_dir():
-                subdirs.append(f.path)
-                document['type'] = "directory"
-            else:
-                document['type'] = "file"
+            try:
+                stats = f.stat()
 
-                guess = mimetypes.guess_type(f.name, strict=False)
-                if guess[0]:
-                    document["mime_type"] = guess[0]
+                document['size_bytes'] = stats.st_size
+                document['modified'] = datetime.fromtimestamp(
+                    stats.st_mtime, tz=timezone.utc)
+                document['created'] = datetime.fromtimestamp(
+                    stats.st_ctime, tz=timezone.utc)
+
+                if f.is_dir():
+                    subdirs.append(f.path)
+                    document['type'] = "directory"
                 else:
-                    try:
-                        guess = filetype.guess(f.path) # fallback peeks into file and tries to decide by content
-                    except PermissionError:
-                        guess = None
-                    if guess:
-                        document["mime_type"] = guess.mime
+                    document['type'] = "file"
 
-            batch.append(document)
-            counter += 1
+                    guess = mimetypes.guess_type(f.name, strict=False)
+                    if guess[0]:
+                        document["mime_type"] = guess[0]
+                    else:
+                        try:
+                            # fallback peeks into file and tries to decide by content
+                            guess = filetype.guess(f.path)
+                        except PermissionError:
+                            guess = None
+                        if guess:
+                            document["mime_type"] = guess.mime
+
+                batch.append(document)
+                counter += 1
+            except FileNotFoundError:
+                if f.is_symlink():
+                    print(f" found broken symlink: '{relative_path}'.")
+                else:
+                    print(f" unknown FileNotFoundError: '{relative_path}'.")
 
         if len(batch) > 100000:
             print(f" processed {counter}, pushing to index...")
@@ -54,9 +67,8 @@ def walk_file_system(current, root_path, target_index):
         for subdir in subdirs:
             walk_file_system(subdir, root_dir, target_index)
     except PermissionError:
-        print(f"PermissionError for {current}, ignoring...")
+        print(f" got PermissionError for '{current}', ignoring.")
 
-    
 
 root_dir = sys.argv[1].removesuffix("/")
 target_index = os.path.basename(root_dir).lower()
