@@ -70,13 +70,14 @@ def walk_file_system(current, root_path, target_index):
         print(f" got PermissionError for '{current}', ignoring.")
 
 
-root_dir = sys.argv[1].removesuffix("/")
-target_index = os.path.basename(root_dir).lower()
+if __name__ == '__main__':
+    root_dir = sys.argv[1].removesuffix("/")
+    target_index = os.path.basename(root_dir).lower()
 
-open_search.create_index(target_index)
+    open_search.create_index(target_index)
 
-walk_file_system(root_dir, root_dir, target_index)
+    walk_file_system(root_dir, root_dir, target_index)
 
-if len(batch) > 0:
-    open_search.push_batch(batch, target_index)
-    print(f" processed {counter} overall")
+    if len(batch) > 0:
+        open_search.push_batch(batch, target_index)
+        print(f" processed {counter} overall")
