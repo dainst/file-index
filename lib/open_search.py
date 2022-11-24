@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 from opensearchpy import OpenSearch, helpers
 from opensearchpy.exceptions import RequestError
 
-import filetype
 import os
 
 password = os.environ.get('FILE_INDEX_PASSWORD')
@@ -43,34 +42,13 @@ def create_index(index_name):
         }
 
         response = client.indices.create(index_name, body=index_body)
-        print(f'Created index index: {index_name}')
+        print(f'Created index: {index_name}')
     except RequestError as e:
         client.indices.delete(index_name)
         create_index(index_name)
 
 def push_to_index(entry: os.DirEntry, root_path: str, index_name: str):
 
-    stats = entry.stat()
-
-    relative_path = entry.path[len(root_path) + 1:]
-
-    guess = filetype.guess(entry.path)
-    
-    if guess is not None:
-        mime_type = guess.mime
-    else:
-        mime_type = None
-
-    document = {
-        'name': entry.name,
-        'path': relative_path,
-        'size_bytes': stats.st_size,
-        'size': bytes_to_human_readable(stats.st_size),
-        'mime_type': mime_type,
-        'modified': datetime.fromtimestamp(stats.st_mtime, tz=timezone.utc),
-        'created': datetime.fromtimestamp(stats.st_ctime, tz=timezone.utc),
-        'last_indexed': datetime.now()
-    }
 
     response = client.index(
         index = index_name,
