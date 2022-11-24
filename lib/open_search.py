@@ -5,8 +5,20 @@ from opensearchpy.exceptions import RequestError
 import os
 
 password = os.environ.get('FILE_INDEX_PASSWORD')
+
 if password is None:
-    raise Exception("FILE_INDEX_PASSWORD environment variable not found!")
+    with open('.env', 'r') as env_file:
+        line = env_file.readline()
+        while line:
+            [key, val] = line.split('=')
+            if key == "FILE_INDEX_PASSWORD":
+                password = val.strip()
+                break
+
+            line = env_file.readline()
+
+    if password is None:
+        raise Exception("FILE_INDEX_PASSWORD environment variable not found!")
 
 host = 'localhost'
 port = 9200
@@ -46,31 +58,6 @@ def create_index(index_name):
     except RequestError as e:
         client.indices.delete(index_name)
         create_index(index_name)
-
-def push_to_index(entry: os.DirEntry, root_path: str, index_name: str):
-
-
-    response = client.index(
-        index = index_name,
-        body = document,
-        id = relative_path,
-        refresh = True
-    )
-
-    print(f'Adding document: {relative_path}')
-
-def push_to_index_b(data, index_name):
-
-    data["indexed"] = datetime.now()
-
-    # TODO: Menschen lesbare size
-
-    response = client.index(
-        index = index_name,
-        body = data,
-        id = data["path"],
-        refresh = True
-    )
 
 def push_batch(docs, index_name):
 
