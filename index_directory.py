@@ -1,10 +1,13 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 import os
 import requests
 import sys
 import filetype
 import mimetypes
-import lib.open_search as open_search
+import time
+import logging
+
+from lib import open_search
 
 batch = []
 counter = 0
@@ -78,9 +81,6 @@ if __name__ == '__main__':
     root_dir = sys.argv[1].removesuffix("/")
     target_index = os.path.basename(root_dir).lower()
 
-    open_search.create_index(target_index)
-
-
     logging.basicConfig(
         filename=f'{target_index}_{date.today()}.log', 
         filemode='w',
@@ -89,6 +89,9 @@ if __name__ == '__main__':
         level=logging.INFO
     )
 
+    open_search.create_index(target_index)
+
+    logging.info(f"Scanning {root_dir}")
     walk_file_system(root_dir, root_dir, target_index)
 
     if len(batch) > 0:
