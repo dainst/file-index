@@ -159,12 +159,12 @@ def process_file(path, index_name):
 if __name__ == '__main__':
 
     start_time = time.time()
-    root_path = sys.argv[1]
-    index_name = os.path.basename(root_path)
+    root_path = sys.argv[1].removesuffix("/")
+    index_name = os.path.basename(root_path.lower())
 
     open_search.create_index(index_name)
 
-    for f in os.scandir("neofinder_data"):
+    for f in os.scandir(root_path):
         if f.is_file() and f.name.endswith('.txt'):
             try:
                 print(f"Processing file {f.name}")
