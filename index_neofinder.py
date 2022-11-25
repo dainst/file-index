@@ -31,6 +31,9 @@ DIRECTORY_VARIANTS = ["Ordner"]
 
 DATE_FORMATS = ["%d.%m.%Y", "%d. %A %Y um %H:%M"]
 
+overall_lines = 0
+faulty_lines = 0
+
 def standardize_headings(headings):
 
     standardized = []
@@ -121,6 +124,8 @@ def process_values(values):
 
 
 def process_file(path, index_name):
+    global overall_lines
+    global faulty_lines
 
     batch_size = 100000
 
@@ -132,11 +137,13 @@ def process_file(path, index_name):
 
         line_counter = 0
         batch = []
+        found_first_row = False
         while(line):
             line = csv_file.readline()
     
             values = line.split('\t')
             if len(values) == len(headings):
+                found_first_row = True
                 values[-1] = values[-1].strip() # remove newline character '\n'
 
                 processed = process_values(dict(zip(headings, values)))
@@ -151,10 +158,18 @@ def process_file(path, index_name):
                     open_search.push_batch(batch, index_name)
                     batch = []
                     logging.info(f" ...processed {line_counter}.")
+            elif found_first_row and line != "":
+                logging.warning("Possible faulty new line in data row (and possibly the following):")
+                logging.warning(f"'{line}'")
+
+                faulty_lines += 1
+
         
         if len(batch) > 0:
             open_search.push_batch(batch, index_name)
             logging.info(f" ...processed {line_counter}.")
+
+        overall_lines += line_counter
 
 if __name__ == '__main__':
 
@@ -184,4 +199,6 @@ if __name__ == '__main__':
                 logging.error(e)
                 logging.error("")
 
-    logging.info(f"{round(time.time() - start_time, 2)} seconds overall.")
+    logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
+    logging.info(f"Indexed {overall_lines} rows.")
+    logging.warning(f"Encountered {faulty_lines} faulty lines, please check the input the CSV.")
