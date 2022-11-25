@@ -64,12 +64,16 @@ def push_batch(docs, index_name):
     data = []
 
     for doc in docs:
+
         doc["indexed"] = datetime.now()
         doc["size"] = bytes_to_human_readable(doc["size_bytes"])
+        _id = doc["_id"]
+        del doc["_id"]
+
         data.append({
             '_op_type': 'index',
             '_index': index_name,
-            '_id': doc["path"],
+            '_id': _id,
             '_source': dict(sorted(doc.items()))
         })
     
