@@ -124,7 +124,7 @@ def process_values(values):
 
 def process_file(path, index_name):
 
-    batch_size = 1000
+    batch_size = 100000
 
     with open(path, 'r') as csv_file:
         line = csv_file.readline()
