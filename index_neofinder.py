@@ -4,6 +4,8 @@ import dateparser
 
 import mimetypes
 import os
+import sys
+import time
 
 from lib import open_search
 
@@ -20,7 +22,6 @@ HEADING_MAPPING = {
     "type": ["Art"],
     "volume": ["Name des Volumes"],
     "neofinder_catalog": ["Katalog"]
-    # "media_info": ["Media-Info"]
 }
 
 OPTIONAL_HEADINGS = ["media_info"]
@@ -155,15 +156,23 @@ def process_file(path, index_name):
             open_search.push_batch(batch, index_name)
             print(f"  processed {line_counter}")
 
-index_name = "neo_finder"
+if __name__ == '__main__':
 
-open_search.create_index(index_name)
+    start_time = time.time()
+    root_path = sys.argv[1]
+    index_name = os.path.basename(root_path)
 
-for f in os.scandir("neofinder_data"):
-    if f.is_file() and f.name.endswith('.txt'):
-        try:
-            print(f"Processing file {f.name}")
-            process_file(f.path, index_name)
-        except Exception as e:
-            print(f"Error when processing file {f.name}.")
-            print(e)
+    open_search.create_index(index_name)
+
+    for f in os.scandir("neofinder_data"):
+        if f.is_file() and f.name.endswith('.txt'):
+            try:
+                print(f"Processing file {f.name}")
+                start_time_file = time.time()
+                process_file(f.path, index_name)
+                print(f"Processed file in {round(time.time() - start_time_file, 2)} seconds.")
+            except Exception as e:
+                print(f"Error when processing file {f.name}.")
+                print(e)
+
+    print(f"{round(time.time() - start_time, 2)} seconds overall.")
