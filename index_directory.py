@@ -73,6 +73,8 @@ def walk_file_system(current, root_path, target_index):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
+
     root_dir = sys.argv[1].removesuffix("/")
     target_index = os.path.basename(root_dir).lower()
 
@@ -92,3 +94,5 @@ if __name__ == '__main__':
     if len(batch) > 0:
         open_search.push_batch(batch, target_index)
         logging.info(f"Processed {counter} overall.")
+
+    logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
