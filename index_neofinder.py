@@ -172,9 +172,10 @@ if __name__ == '__main__':
                 print(f"Processing file {f.name}")
                 start_time_file = time.time()
                 process_file(f.path, index_name)
-                print(f"Processed file in {round(time.time() - start_time_file, 2)} seconds.")
+                print(f"Processed file in {round(time.time() - start_time_file, 2)} seconds.\n")
             except Exception as e:
                 print(f"Error when processing file {f.name}.")
                 print(e)
+                print("")
 
     print(f"{round(time.time() - start_time, 2)} seconds overall.")
