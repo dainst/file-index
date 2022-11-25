@@ -57,19 +57,19 @@ def walk_file_system(current, root_path, target_index):
                 counter += 1
             except FileNotFoundError:
                 if f.is_symlink():
-                    print(f" found broken symlink: '{relative_path}'.")
+                    logging.warning(f"Found broken symlink: '{relative_path}'.")
                 else:
-                    print(f" unknown FileNotFoundError: '{relative_path}'.")
+                    logging.error(f"Unknown FileNotFoundError: '{relative_path}'.")
 
         if len(batch) > 100000:
-            print(f" processed {counter}, pushing to index...")
+            logging.info(f"...processed {counter}, pushing to index.")
             open_search.push_batch(batch, target_index)
             batch = []
 
         for subdir in subdirs:
             walk_file_system(subdir, root_dir, target_index)
     except PermissionError:
-        print(f" got PermissionError for '{current}', ignoring.")
+        logging.error(f"Got PermissionError for '{current}', ignoring.")
 
 
 if __name__ == '__main__':
@@ -78,8 +78,17 @@ if __name__ == '__main__':
 
     open_search.create_index(target_index)
 
+
+    logging.basicConfig(
+        filename=f'{target_index}_{date.today()}.log', 
+        filemode='w',
+        encoding='utf-8',
+        format='%(asctime)s %(message)s',
+        level=logging.INFO
+    )
+
     walk_file_system(root_dir, root_dir, target_index)
 
     if len(batch) > 0:
         open_search.push_batch(batch, target_index)
-        print(f" processed {counter} overall")
+        logging.info(f"Processed {counter} overall.")

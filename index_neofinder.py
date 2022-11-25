@@ -1,11 +1,12 @@
 import re
-from datetime import datetime
+from datetime import date, datetime
 import dateparser
 
 import mimetypes
 import os
 import sys
 import time
+import logging
 
 from lib import open_search
 
@@ -46,12 +47,11 @@ def standardize_headings(headings):
         if updated:
             standardized.append(updated)
         else:
-            # print(f"Found no standardized heading value für {heading}")
             standardized.append(heading)
 
     if len(HEADING_MAPPING.keys() - standardized) != 0:
-        print("The following column headings were expected but could not be mapped:")
-        print(HEADING_MAPPING.keys() - standardized)
+        logging.error(" The following column headings were expected but could not be mapped:")
+        logging.error(HEADING_MAPPING.keys() - standardized)
 
         raise Exception("Required field not found.")
 
@@ -66,9 +66,7 @@ def parse_size_in_bytes(neofinder_value):
     if m:
         return int(m.group(1).replace('.', ''))
         
-    print(f"Unable to match neofinder size value {neofinder_value}.")
-
-
+    logging.warning(f" Unable to match neofinder size value {neofinder_value}.")
 
 def process_values(values):
 
@@ -78,18 +76,18 @@ def process_values(values):
     modified_standardized = dateparser.parse(values['modified'], date_formats=DATE_FORMATS)
     if not modified_standardized:
         if values['modified'] != "-":
-            print(f"Unable to parse modification date for '{values['path']}': '{values['modified']}'")
+            logging.info(f" Unable to parse modification date for '{values['path']}': '{values['modified']}'")
     
     created_standardized = dateparser.parse(values['created'], date_formats=DATE_FORMATS)
     if not created_standardized:
         # Old exports seem to have missing creation dates ('-' values), we fallback to the modified date.
         if values['created'] != "-":
-            print(f"Unable to parse creation date for '{values['path']}': '{values['created']}'")
+            logging.info(f" Unable to parse creation date for '{values['path']}': '{values['created']}'")
         else:
             created_standardized = modified_standardized
 
     if not values["created"] and not values["modified"]:
-        print(f"Neither creation nor modification date found for '{values['path']}'.")
+        logging.warning(f" Neither creation nor modification date found for '{values['path']}'.")
 
     values['neofinder_created'] = values["created"]
     values['neofinder_modified'] = values["modified"]
@@ -152,11 +150,11 @@ def process_file(path, index_name):
                 if len(batch) == batch_size:
                     open_search.push_batch(batch, index_name)
                     batch = []
-                    print(f"  processed {line_counter}")
+                    logging.info(f" ...processed {line_counter}.")
         
         if len(batch) > 0:
             open_search.push_batch(batch, index_name)
-            print(f"  processed {line_counter}")
+            logging.info(f" ...processed {line_counter}.")
 
 if __name__ == '__main__':
 
@@ -164,18 +162,26 @@ if __name__ == '__main__':
     root_path = sys.argv[1].removesuffix("/")
     index_name = os.path.basename(root_path.lower())
 
+    logging.basicConfig(
+        filename=f'{index_name}_{date.today()}.log', 
+        filemode='w',
+        encoding='utf-8',
+        format='%(asctime)s %(message)s',
+        level=logging.INFO
+    )
+
     open_search.create_index(index_name)
 
     for f in os.scandir(root_path):
         if f.is_file() and f.name.endswith('.txt'):
             try:
-                print(f"Processing file {f.name}")
+                logging.info(f"Processing file '{f.name}'.")
                 start_time_file = time.time()
                 process_file(f.path, index_name)
-                print(f"Processed file in {round(time.time() - start_time_file, 2)} seconds.\n")
+                logging.info(f"Processed file in {round(time.time() - start_time_file, 2)} seconds.\n")
             except Exception as e:
-                print(f"Error when processing file {f.name}.")
-                print(e)
-                print("")
+                logging.error(f"Error when processing file '{f.name}'.")
+                logging.error(e)
+                logging.error("")
 
-    print(f"{round(time.time() - start_time, 2)} seconds overall.")
+    logging.info(f"{round(time.time() - start_time, 2)} seconds overall.")

@@ -3,6 +3,7 @@ from opensearchpy import OpenSearch, helpers
 from opensearchpy.exceptions import RequestError
 
 import os
+import logging
 
 password = os.environ.get('FILE_INDEX_PASSWORD')
 
@@ -31,6 +32,8 @@ client = OpenSearch(
     use_ssl = False
 )
 
+logging.getLogger('opensearch').setLevel(logging.WARNING)
+
 def create_index(index_name):
     try:
         # Create an index with non-default settings.
@@ -54,10 +57,15 @@ def create_index(index_name):
         }
 
         response = client.indices.create(index_name, body=index_body)
-        print(f'Created index: {index_name}')
+        logging.info(f"Created index: '{index_name}'.\n")
     except RequestError as e:
-        client.indices.delete(index_name)
-        create_index(index_name)
+        if e.status_code == 400 and e.error == "resource_already_exists_exception":
+            logging.info(f"'{index_name}' index already exists, recreating...")
+            client.indices.delete(index_name)
+            logging.info(f"Deleted index: '{index_name}'.")
+            create_index(index_name)
+        else:
+            raise e
 
 def push_batch(docs, index_name):
 
