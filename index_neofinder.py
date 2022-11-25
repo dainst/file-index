@@ -175,18 +175,17 @@ def process_file(path, index_name):
                 logging.warning(f"'{sanitized}'")
                 next_line = f"{sanitized}{csv_file.readline()}"
                 
-                found_faulty_line = True
-
                 logging.warning("Recombined with following line to:")
                 logging.warning(f"'{next_line.strip()}'")
 
-                faulty_lines += 1
+                found_faulty_line = True
 
             elif len(values) > len(headings):
-                logging.error("Failed to fix row, ended up with more columns than headings:")
+                logging.error("Failed to fix row, ended up with more data columns than headings:")
                 logging.error(f"'{next_line}'")
 
                 next_line = csv_file.readline()
+                faulty_lines += 1
 
             else:
                 next_line = csv_file.readline()
@@ -194,7 +193,7 @@ def process_file(path, index_name):
         
         if len(batch) > 0:
             open_search.push_batch(batch, index_name)
-            logging.info(f" ...processed {line_counter}.")
+            logging.info(f" ...processed {line_counter} rows.")
 
         overall_lines += line_counter
 
@@ -229,3 +228,4 @@ if __name__ == '__main__':
     logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
     logging.info(f"Indexed {overall_lines} rows.")
     logging.info(f"Indexed {no_date} rows without creation/modification date.")
+    logging.error(f"Encountered {faulty_lines} unfixable faulty rows, please check the input the CSV.")
