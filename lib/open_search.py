@@ -5,31 +5,47 @@ from opensearchpy.exceptions import RequestError
 import os
 import logging
 
-password = os.environ.get('FILE_INDEX_PASSWORD')
+host = None
+port = None
+user = None
+password = None
+use_ssl = False
 
-if password is None:
-    with open('.env', 'r') as env_file:
+with open('.env', 'r') as env_file:
+    line = env_file.readline()
+    while line:
+        [key, val] = line.split('=')
+        if key == "FILE_INDEX_HOST":
+            host = val.strip()
+        if key == "FILE_INDEX_PORT":
+            port = val.strip()
+        if key == "FILE_INDEX_USER":
+            user = val.strip()
+        if key == "FILE_INDEX_PASSWORD":
+            password = val.strip()
+        if key == "FILE_INDEX_USE_SSL":
+            if val.strip() == "True":
+                use_ssl = True
+        
         line = env_file.readline()
-        while line:
-            [key, val] = line.split('=')
-            if key == "FILE_INDEX_PASSWORD":
-                password = val.strip()
-                break
 
-            line = env_file.readline()
+if host is None:
+    raise Exception("Found no FILE_INDEX_HOST in .env")
+if port is None:
+    raise Exception("Found no FILE_INDEX_PORT in .env")
+if user is None:
+    raise Exception("Found no FILE_INDEX_USER in .env")
+if password is None:
+    raise Exception("Found no FILE_INDEX_PASSWORD in .env")
 
-    if password is None:
-        raise Exception("FILE_INDEX_PASSWORD environment variable not found!")
 
-host = 'localhost'
-port = 9200
 auth = ('admin', password)
 
 client = OpenSearch(
     hosts = [{'host': host, 'port': port}],
     http_compress = True, # enables gzip compression for request bodies
     http_auth = auth,
-    use_ssl = False
+    use_ssl = use_ssl
 )
 
 logging.getLogger('opensearch').setLevel(logging.WARNING)
