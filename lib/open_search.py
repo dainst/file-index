@@ -93,4 +93,4 @@ def bytes_to_human_readable(number: int):
         number = round(number * 0.001, 2)
         counter += 1
 
-    return f"{number} {notations[:-1]}"
+    return f"{number} {notations[-1]}"
