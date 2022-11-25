@@ -133,6 +133,7 @@ def process_file(path, index_name):
     
             values = line.split('\t')
             if len(values) == len(headings):
+                values[-1] = values[-1].strip() # remove newline character '\n'
                 processed = process_values(dict(zip(headings, values)))
 
                 batch.append(processed)
