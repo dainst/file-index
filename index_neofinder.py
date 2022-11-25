@@ -100,11 +100,16 @@ def process_values(values):
     values["path"] = values["path"].lstrip(f"{values['neofinder_catalog']}:") 
     values["path"] = values["path"].replace(":", "/")
 
-    values["neofinder_type"] = values["type"]
-    if values["type"] in DIRECTORY_VARIANTS:
-        values["type"] = "directory"
-    else:
-        values["type"] = "file"
+    parsed_value = "unknown"
+    if values["type"] != "":
+        values["neofinder_type"] = values["type"]
+        if values["type"].strip() != "-":
+            if values["type"] in DIRECTORY_VARIANTS:
+                parsed_value = "directory"
+            else: 
+                parsed_value = "file"
+        
+    values["type"] = parsed_value
 
     values["neofinder_size"] = values["size_bytes"]
     values["size_bytes"] = parse_size_in_bytes(values["size_bytes"])
