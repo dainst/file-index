@@ -140,11 +140,13 @@ def process_file(path, index_name):
             values = line.split('\t')
             if len(values) == len(headings):
                 values[-1] = values[-1].strip() # remove newline character '\n'
-                processed = process_values(dict(zip(headings, values)))
 
+                processed = process_values(dict(zip(headings, values)))
+                # Using path as id caused issues because some path are longer than 512
+                # thus too long for OpenSearch document ids.
+                processed["_id"] = f"{os.path.basename(path)}-{line_counter}"
                 batch.append(processed)
 
-                # open_search.push_to_index_b(processed, index_name)
                 line_counter += 1
 
                 if len(batch) == batch_size:

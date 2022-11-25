@@ -51,6 +51,8 @@ def walk_file_system(current, root_path, target_index):
                         if guess:
                             document["mime_type"] = guess.mime
 
+                document["_id"] = relative_path
+
                 batch.append(document)
                 counter += 1
             except FileNotFoundError:
