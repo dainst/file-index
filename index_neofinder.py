@@ -33,6 +33,7 @@ DATE_FORMATS = ["%d.%m.%Y", "%d. %A %Y um %H:%M"]
 
 overall_lines = 0
 faulty_lines = 0
+no_date = 0
 
 def standardize_headings(headings):
 
@@ -72,6 +73,7 @@ def parse_size_in_bytes(neofinder_value):
     logging.warning(f" Unable to match neofinder size value {neofinder_value}.")
 
 def process_values(values):
+    global no_date
 
     # Remove all dictionary entries that are not defined as keys in the HEADING_MAPPING above
     values = dict(filter(lambda item: (item[0] in HEADING_MAPPING.keys()), values.items()))
@@ -89,11 +91,12 @@ def process_values(values):
         else:
             created_standardized = modified_standardized
 
-    if not values["created"] and not values["modified"]:
-        logging.warning(f" Neither creation nor modification date found for '{values['path']}'.")
-
     values['neofinder_created'] = values["created"]
     values['neofinder_modified'] = values["modified"]
+
+    if not modified_standardized and not created_standardized:
+        logging.info(f" Neither creation nor modification date found for '{values['path']}'.")
+        no_date += 1
 
     values["created"] = created_standardized
     values["modified"] = modified_standardized
@@ -220,4 +223,4 @@ if __name__ == '__main__':
 
     logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
     logging.info(f"Indexed {overall_lines} rows.")
-    logging.warning(f"Encountered {faulty_lines} faulty lines, please check the input the CSV.")
+    logging.info(f"Indexed {no_date} rows without creation/modification date.")
