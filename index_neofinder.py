@@ -137,13 +137,18 @@ def process_file(path, index_name):
 
         line_counter = 0
         batch = []
-        found_first_row = False
-        while(line):
-            line = csv_file.readline()
+        found_first_data_row = False
+        found_faulty_line = False
+        next_line = csv_file.readline()
+        while(next_line):
     
-            values = line.split('\t')
+            values = next_line.split('\t')
             if len(values) == len(headings):
-                found_first_row = True
+                if found_faulty_line:
+                    logging.warning("Faulty line fixed.\n")
+                    found_faulty_line = False
+
+                found_first_data_row = True
                 values[-1] = values[-1].strip() # remove newline character '\n'
 
                 processed = process_values(dict(zip(headings, values)))
@@ -153,16 +158,30 @@ def process_file(path, index_name):
                 batch.append(processed)
 
                 line_counter += 1
+                next_line = csv_file.readline()
 
-                if len(batch) == batch_size:
-                    open_search.push_batch(batch, index_name)
-                    batch = []
-                    logging.info(f" ...processed {line_counter}.")
-            elif found_first_row and line != "":
-                logging.warning("Possible faulty new line in data row (and possibly the following):")
-                logging.warning(f"'{line}'")
+            elif len(values) < len(headings) and found_first_data_row and next_line != "":
+
+                sanitized = next_line.strip('\n')
+                logging.warning("Possible faulty new line in data row:")
+                logging.warning(f"'{sanitized}'")
+                next_line = f"{sanitized}{csv_file.readline()}"
+                
+                found_faulty_line = True
+
+                logging.warning("Recombined with following line to:")
+                logging.warning(f"'{next_line.strip()}'")
 
                 faulty_lines += 1
+
+            elif len(values) > len(headings):
+                logging.error("Failed to fix row, ended up with more columns than headings:")
+                logging.error(f"'{next_line}'")
+
+                next_line = csv_file.readline()
+
+            else:
+                next_line = csv_file.readline()
 
         
         if len(batch) > 0:
