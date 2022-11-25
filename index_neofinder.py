@@ -228,4 +228,5 @@ if __name__ == '__main__':
     logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
     logging.info(f"Indexed {overall_lines} rows.")
     logging.info(f"Indexed {no_date} rows without creation/modification date.")
-    logging.error(f"Encountered {faulty_lines} unfixable faulty rows, please check the input the CSV.")
+    if faulty_lines > 0:
+        logging.warning(f"Encountered {faulty_lines} unfixable faulty rows, please check the input the CSV.")
