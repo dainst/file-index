@@ -160,6 +160,11 @@ def process_file(path, index_name):
                 processed["_id"] = f"{os.path.basename(path)}-{line_counter}"
                 batch.append(processed)
 
+                if len(batch) == batch_size:
+                    open_search.push_batch(batch, index_name)
+                    batch = []
+                    logging.info(f" ...processed {line_counter} row.")
+
                 line_counter += 1
                 next_line = csv_file.readline()
 
