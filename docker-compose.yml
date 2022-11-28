@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   opensearch:
     image: opensearchproject/opensearch:2.4.0
@@ -17,9 +17,7 @@ services:
         hard: 65536
     volumes:
       - ./opensearch-data:/usr/share/opensearch/data
-      - type: bind
-        source: ./opensearch-security/internal_users.yml
-        target: /usr/share/opensearch/config/opensearch-security/internal_users.yml
+      - ./opensearch-security/internal_users.yml:/usr/share/opensearch/config/opensearch-security/internal_users.yml
     ports:
       - 9200:9200
       - 9600:9600 # required for Performance Analyzer
@@ -30,3 +28,5 @@ services:
       - 5601:5601
     environment:
       OPENSEARCH_HOSTS: '["http://file-index-opensearch:9200"]'
+      OPENSEARCH_PASSWORD: ${FILE_INDEX_PASSWORD}
+      OPENSEARCH_USERNAME: ${FILE_INDEX_USER}

@@ -26,7 +26,7 @@ with open('.env', 'r') as env_file:
         if key == "FILE_INDEX_USE_SSL":
             if val.strip() == "True":
                 use_ssl = True
-        
+
         line = env_file.readline()
 
 if host is None:
@@ -38,8 +38,7 @@ if user is None:
 if password is None:
     raise Exception("Found no FILE_INDEX_PASSWORD in .env")
 
-
-auth = ('admin', password)
+auth = (user, password)
 
 client = OpenSearch(
     hosts = [{'host': host, 'port': port}],

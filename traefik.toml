@@ -3,16 +3,16 @@
 [entryPoints]
   [entryPoints.web]
     address = ":80"
-    [entryPoints.web.http.redirections]
-      [entryPoints.web.http.redirections.entryPoint]
-        to = "websecure"
-  [entryPoints.websecure]
-    address = ":443"
+#    [entryPoints.web.http.redirections]
+#      [entryPoints.web.http.redirections.entryPoint]
+#        to = "websecure"
+#  [entryPoints.websecure]
+#    address = ":443"
 
-[certificatesResolvers.file-index-resolver.acme]
-  email = "dev@dainst.org"
-  storage = "acme.json"
-  [certificatesResolvers.file-index-resolver.acme.httpChallenge]
-    # used during the challenge
-    entryPoint = "web"
-  [certificatesResolvers.file-index-resolver.acme.tlsChallenge]
+#[certificatesResolvers.file-index-resolver.acme]
+#  email = "dev@dainst.org"
+#  storage = "acme.json"
+#  [certificatesResolvers.file-index-resolver.acme.httpChallenge]
+#    # used during the challenge
+#    entryPoint = "web"
+#  [certificatesResolvers.file-index-resolver.acme.tlsChallenge]
