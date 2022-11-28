@@ -21,7 +21,7 @@ HEADING_MAPPING = {
     "created": ["Erstelldatum"],
     "modified": ["Änderungsdatum"],
     "type": ["Art"],
-    "volume": ["Name des Volumes"],
+    "neofinder_volume": ["Name des Volumes"],
     "neofinder_catalog": ["Katalog"]
 }
 
