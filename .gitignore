@@ -1,5 +1,6 @@
 .venv/
 .env
+acme.json
 opensearch-data/
 opensearch-security/internal_users.yml
 
