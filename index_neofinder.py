@@ -158,6 +158,7 @@ def process_file(path, index_name):
                 # Using path as id caused issues because some path are longer than 512
                 # thus too long for OpenSearch document ids.
                 processed["_id"] = f"{os.path.basename(path)}-{line_counter}"
+                processed["neofinder_export_file"] = os.path.basename(path)
                 batch.append(processed)
 
                 line_counter += 1
