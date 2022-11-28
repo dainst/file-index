@@ -1,0 +1,26 @@
+version: '3'
+services:
+  opensearch:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.search.rule=Host(`search.${HOST}`)        
+      - traefik.http.services.search.loadbalancer.server.port=9200
+      - traefik.http.routers.search.tls=true
+      - traefik.http.routers.search.tls.certresolver=file-index-resolver
+  opensearch-dashboards:
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboards.rule=Host(`${HOST}`)        
+      - traefik.http.services.dashboards.loadbalancer.server.port=5601
+      - traefik.http.routers.dashboards.tls=true
+      - traefik.http.routers.dashboards.tls.certresolver=file-index-resolver
+  traefik:
+    image: "traefik:v2.4"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./acme.json:/acme.json"
+      - "./traefik.toml:/etc/traefik/traefik.toml"
+    restart: always
