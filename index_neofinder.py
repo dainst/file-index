@@ -165,7 +165,7 @@ def process_file(path, index_name):
                 if len(batch) == batch_size:
                     open_search.push_batch(batch, index_name)
                     batch = []
-                    logging.info(f" ...processed {line_counter} row.")
+                    logging.info(f" ...processed {line_counter} rows.")
 
                 next_line = csv_file.readline()
 
