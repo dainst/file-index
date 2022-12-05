@@ -80,13 +80,13 @@ def process_values(values):
 
     modified_standardized = dateparser.parse(values['modified'], date_formats=DATE_FORMATS)
     if not modified_standardized:
-        if values['modified'] != "-":
+        if values['modified'] != "-" and values['modified']:
             logging.info(f" Unable to parse modification date for '{values['path']}': '{values['modified']}'")
     
     created_standardized = dateparser.parse(values['created'], date_formats=DATE_FORMATS)
     if not created_standardized:
         # Old exports seem to have missing creation dates ('-' values), we fallback to the modified date.
-        if values['created'] != "-":
+        if values['created'] != "-" and values['created']:
             logging.info(f" Unable to parse creation date for '{values['path']}': '{values['created']}'")
         else:
             created_standardized = modified_standardized
@@ -95,7 +95,7 @@ def process_values(values):
     values['neofinder_modified'] = values["modified"]
 
     if not modified_standardized and not created_standardized:
-        logging.info(f" Neither creation nor modification date found for '{values['path']}'.")
+        logging.debug(f" Neither creation nor modification date found for '{values['path']}'.")
         no_date += 1
 
     values["created"] = created_standardized
