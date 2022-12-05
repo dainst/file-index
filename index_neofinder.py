@@ -148,7 +148,7 @@ def process_file(path, index_name):
             values = next_line.split('\t')
             if len(values) == len(headings):
                 if found_faulty_line:
-                    logging.warning("Faulty line fixed.\n")
+                    logging.debug("Faulty line fixed.\n")
                     found_faulty_line = False
 
                 found_first_data_row = True
@@ -172,12 +172,12 @@ def process_file(path, index_name):
             elif len(values) < len(headings) and found_first_data_row and next_line != "":
 
                 sanitized = next_line.strip('\n')
-                logging.warning("Possible faulty new line in data row:")
-                logging.warning(f"'{sanitized}'")
+                logging.debug("Possible faulty new line in data row:")
+                logging.debug(f"'{sanitized}'")
                 next_line = f"{sanitized}{csv_file.readline()}"
                 
-                logging.warning("Recombined with following line to:")
-                logging.warning(f"'{next_line.strip()}'")
+                logging.debug("Recombined with following line to:")
+                logging.debug(f"'{next_line.strip()}'")
 
                 found_faulty_line = True
 
