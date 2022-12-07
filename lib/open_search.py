@@ -14,19 +14,27 @@ use_ssl = False
 with open('.env', 'r') as env_file:
     line = env_file.readline()
     while line:
-        [key, val] = line.split('=')
-        if key == "FILE_INDEX_HOST":
-            host = val.strip()
-        if key == "FILE_INDEX_PORT":
-            port = val.strip()
-        if key == "FILE_INDEX_USER":
-            user = val.strip()
-        if key == "FILE_INDEX_PASSWORD":
-            password = val.strip()
-        if key == "FILE_INDEX_USE_SSL":
-            if val.strip() == "True":
-                use_ssl = True
+        try:
+            if line.strip()[0] == '#':
+                # ignore lines that are commented out
+                pass
+            else:
+                [key, val] = line.split('=')
 
+                if key == "FILE_INDEX_HOST":
+                    host = val.strip()
+                if key == "FILE_INDEX_PORT":
+                    port = val.strip()
+                if key == "FILE_INDEX_USER":
+                    user = val.strip()
+                if key == "FILE_INDEX_PASSWORD":
+                    password = val.strip()
+                if key == "FILE_INDEX_USE_SSL":
+                    if val.strip() == "True":
+                        use_ssl = True
+        except ValueError as e:
+            # Ignore lines without a key value pair separted by '='
+            pass
         line = env_file.readline()
 
 if host is None:
