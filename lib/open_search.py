@@ -15,12 +15,12 @@ with open('.env', 'r') as env_file:
     line = env_file.readline()
     while line:
         try:
-            if line.strip()[0] == '#':
+            [key, val] = line.split('=')
+
+            if key.strip()[0] == '#':
                 # ignore lines that are commented out
                 pass
             else:
-                [key, val] = line.split('=')
-
                 if key == "FILE_INDEX_HOST":
                     host = val.strip()
                 if key == "FILE_INDEX_PORT":
