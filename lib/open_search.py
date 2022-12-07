@@ -49,7 +49,7 @@ client = OpenSearch(
 
 logging.getLogger('opensearch').setLevel(logging.WARNING)
 
-def create_index(index_name):
+def create_index(index_name, clear=False):
     try:
         # Create an index with non-default settings.
         index_body = {
@@ -75,10 +75,13 @@ def create_index(index_name):
         logging.info(f"Created index: '{index_name}'.\n")
     except RequestError as e:
         if e.status_code == 400 and e.error == "resource_already_exists_exception":
-            logging.info(f"'{index_name}' index already exists, recreating...")
-            client.indices.delete(index_name)
-            logging.info(f"Deleted index: '{index_name}'.")
-            create_index(index_name)
+            if clear:
+                logging.info(f"'{index_name}' index already exists, recreating...")
+                client.indices.delete(index_name)
+                logging.info(f"Deleted index: '{index_name}'.")
+                create_index(index_name)
+            else:
+                logging.info(f"'{index_name}' index found...")
         else:
             raise e
 

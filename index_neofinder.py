@@ -2,6 +2,7 @@ import re
 from datetime import date, datetime
 import dateparser
 
+import argparse
 import mimetypes
 import os
 import sys
@@ -34,6 +35,10 @@ DATE_FORMATS = ["%d.%m.%Y", "%d. %A %Y um %H:%M"]
 overall_lines = 0
 faulty_lines = 0
 no_date = 0
+
+parser = argparse.ArgumentParser(description='Process NeoFinder export files.')
+parser.add_argument('root_directory', type=str, help="The directory containing exported NeoFinder files (txt). Its name will be used as the name for the target index.")
+parser.add_argument('--clear', action='store_true',  dest='clear', help="Clear existing search index if found, default: false.")
 
 def standardize_headings(headings):
 
@@ -200,8 +205,11 @@ def process_file(path, index_name):
 
 if __name__ == '__main__':
 
+
+    options = vars(parser.parse_args())
+
     start_time = time.time()
-    root_path = sys.argv[1].removesuffix("/")
+    root_path = options["root_directory"].removesuffix("/")
     index_name = os.path.basename(root_path.lower())
 
     logging.basicConfig(
@@ -212,7 +220,7 @@ if __name__ == '__main__':
         level=logging.INFO
     )
 
-    open_search.create_index(index_name)
+    open_search.create_index(index_name, options['clear'])
 
     for f in os.scandir(root_path):
         if f.is_file() and f.name.endswith('.txt'):
