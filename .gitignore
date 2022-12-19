@@ -7,3 +7,6 @@ opensearch-security/internal_users.yml
 __pycache__
 
 *.log
+
+log/*
+output/*

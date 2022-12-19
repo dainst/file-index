@@ -9,7 +9,7 @@ import logging
 import argparse
 import json
 
-from lib import open_search
+from lib import open_search, output_helper
 
 batch = []
 counter = 0
@@ -82,7 +82,7 @@ def walk_file_system(current, root_path, target_index, output_directory):
         if len(batch) > 100000:
             logging.info(f"...processed {counter}, pushing to index.")
             if output_directory:
-                with open(f"{output_directory}/{counter}.json", 'w') as f:
+                with open(f"{output_directory}/{counter}_files.json", 'w') as f:
                     json.dump(batch, f, default=json_serial)
             else:
                 open_search.push_batch(batch, target_index, output_directory)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     target_index = os.path.basename(root_dir).lower()
 
     logging.basicConfig(
-        filename=f'{target_index}_{date.today()}.log', 
+        filename=f'{output_helper.get_logging_dir()}/{target_index}_{date.today()}.log', 
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     output_directory = None
     if options['to_file']:
-        output_directory = f"{target_index}_{date.today()}"
+        output_directory = f"{output_helper.get_output_base_dir()}/{target_index}_{date.today()}"
         try:
             os.mkdir(output_directory)
         except FileExistsError:
@@ -126,7 +126,7 @@ if __name__ == '__main__':
 
     if len(batch) > 0:
         if output_directory:
-            with open(f"{output_directory}/{counter}.json", 'w') as f:
+            with open(f"{output_directory}/{counter}_files.json", 'w') as f:
                 json.dump(batch, f, default=json_serial)
         else:
             open_search.push_batch(batch, target_index, output_directory)

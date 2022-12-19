@@ -10,7 +10,7 @@ import time
 import logging
 import json
 
-from lib import open_search
+from lib import open_search, output_helper
 
 SIZE_PATTERN_PLAIN_BYTE_VALUE = r"^\d+$"
 SIZE_PATTERN_VARIANT_1 = r"^.+\(([\d\.]+) Bytes\)$" # "481,6 KB (481.631 Bytes)"
@@ -231,7 +231,7 @@ if __name__ == '__main__':
     index_name = os.path.basename(root_path.lower())
 
     logging.basicConfig(
-        filename=f'{index_name}_{date.today()}.log', 
+        filename=f'{output_helper.get_logging_dir()}/{index_name}_{date.today()}.log', 
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
@@ -241,7 +241,7 @@ if __name__ == '__main__':
 
     output_directory = None
     if options["to_file"]:
-        output_directory = f"{index_name}_{date.today()}"
+        output_directory = f"{output_helper.get_output_base_dir()}/{index_name}_{date.today()}"
         try:
             os.mkdir(output_directory)
         except FileExistsError:
