@@ -7,8 +7,8 @@ import logging
 from lib import open_search
 import time
 
-parser = argparse.ArgumentParser(description='Process NeoFinder export files.')
-parser.add_argument('root_directory', type=str, help="The directory containing exported NeoFinder files (txt). Its name will be used as the name for the target index.")
+parser = argparse.ArgumentParser(description='Index result files preprocessed by "index_neofinder.py" or "index_directory.py".')
+parser.add_argument('root_directory', type=str, help="The directory containing preprocessed files (json).")
 parser.add_argument('--clear', action='store_true',  dest='clear', help="Clear existing search index if found, default: false.")
 
 
