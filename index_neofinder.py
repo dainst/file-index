@@ -8,11 +8,19 @@ import os
 import sys
 import time
 import logging
+import json
 
 from lib import open_search
 
 SIZE_PATTERN_PLAIN_BYTE_VALUE = r"^\d+$"
 SIZE_PATTERN_VARIANT_1 = r"^.+\(([\d\.]+) Bytes\)$" # "481,6 KB (481.631 Bytes)"
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))
 
 
 HEADING_MAPPING = {
@@ -39,6 +47,7 @@ no_date = 0
 parser = argparse.ArgumentParser(description='Process NeoFinder export files.')
 parser.add_argument('root_directory', type=str, help="The directory containing exported NeoFinder files (txt). Its name will be used as the name for the target index.")
 parser.add_argument('--clear', action='store_true',  dest='clear', help="Clear existing search index if found, default: false.")
+parser.add_argument('--to-file', action='store_true', dest='to_file', help="Save result as JSON files, which can be indexed at a later point.")
 
 def standardize_headings(headings):
 
@@ -131,7 +140,7 @@ def process_values(values):
     return values
 
 
-def process_file(path, index_name):
+def process_file(path, index_name, output_directory):
     global overall_lines
     global faulty_lines
 
@@ -168,7 +177,12 @@ def process_file(path, index_name):
 
                 line_counter += 1
                 if len(batch) == batch_size:
-                    open_search.push_batch(batch, index_name)
+
+                    if output_directory:
+                        with open(f"{output_directory}/{os.path.basename(path)}_{line_counter}.json", 'w') as f:
+                            json.dump(batch, f, default=json_serial)
+                    else:
+                        open_search.push_batch(batch, index_name)
                     batch = []
                     logging.info(f" ...processed {line_counter} rows.")
 
@@ -198,13 +212,17 @@ def process_file(path, index_name):
 
         
         if len(batch) > 0:
-            open_search.push_batch(batch, index_name)
+            if output_directory:
+                with open(f"{output_directory}/{os.path.basename(path)}_{line_counter}.json", 'w') as f:
+                    json.dump(batch, f, default=json_serial)
+            else:
+                open_search.push_batch(batch, index_name)
+
             logging.info(f" ...processed {line_counter} rows.")
 
         overall_lines += line_counter
 
 if __name__ == '__main__':
-
 
     options = vars(parser.parse_args())
 
@@ -220,14 +238,25 @@ if __name__ == '__main__':
         level=logging.INFO
     )
 
-    open_search.create_index(index_name, options['clear'])
+
+    output_directory = None
+    if options["to_file"]:
+        output_directory = f"{index_name}_{date.today()}"
+        try:
+            os.mkdir(output_directory)
+        except FileExistsError:
+            logging.info(f"Output directory {output_directory} already exists.")
+            
+    else:
+        open_search.create_index(index_name, options['clear'])
+
 
     for f in os.scandir(root_path):
         if f.is_file() and f.name.endswith('.txt'):
             try:
                 logging.info(f"Processing file '{f.name}'.")
                 start_time_file = time.time()
-                process_file(f.path, index_name)
+                process_file(f.path, index_name, output_directory)
                 logging.info(f"Processed file in {round(time.time() - start_time_file, 2)} seconds.\n")
             except Exception as e:
                 logging.error(f"Error when processing file '{f.name}'.")
