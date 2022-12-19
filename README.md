@@ -33,6 +33,12 @@ python3 index_neofinder.py <path to directory containing neofinder exports>
 
 The above command will (re-)create an index with the name of the provided directory, process all `txt` files it finds within (ignoring subdirectories) and push their data to the created index.
 
+```
+python index_preprocessed.py <path to directory containing preprocessed files>
+```
+
+The above script will index preprocessed data created by the other two python scripts if they have been run using the `--to-file` option.
+
 # Running local OpenSearch
 
 ```
