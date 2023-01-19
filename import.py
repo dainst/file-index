@@ -8,8 +8,9 @@ from lib import open_search
 import time
 
 parser = argparse.ArgumentParser(description='Index result files preprocessed by "index_neofinder.py" or "index_directory.py".')
+parser.add_argument('index_name', type=str, help="The index the data should be imported to.")
 parser.add_argument('root_directory', type=str, help="The directory containing preprocessed files (json).")
-parser.add_argument('--clear', action='store_true',  dest='clear', help="Clear existing search index if found, default: false.")
+parser.add_argument('--clear', action='store_true',  dest='clear', help="Clear existing index if found, optional.")
 
 
 options = vars(parser.parse_args())
@@ -17,11 +18,11 @@ options = vars(parser.parse_args())
 if __name__ == '__main__':
 
     start_time = time.time()
+    index_name = options["index_name"]
     root_path = options["root_directory"].removesuffix("/")
-    [index_name, _date] = os.path.basename(root_path).rsplit("_",  maxsplit=1)
 
     logging.basicConfig(
-        filename=f'{index_name}_preprocessed_{date.today()}.log', 
+        filename=f'{index_name}_import_{date.today()}.log', 
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',

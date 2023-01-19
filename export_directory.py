@@ -8,16 +8,15 @@ import time
 import logging
 import argparse
 import json
+import hashlib
 
-from lib import open_search, output_helper
+from lib import output_helper
 
 batch = []
 counter = 0
 
 parser = argparse.ArgumentParser(description='Process file system tree.')
-parser.add_argument('root_directory', type=str, help="The directory containing exported NeoFinder files (txt). Its name will be used as the name for the target index.")
-parser.add_argument('--clear', action='store_true',  dest='clear', help="Clear existing search index if found, default: false.")
-parser.add_argument('--to-file', action='store_true', dest='to_file', help="Save result as JSON files, which can be indexed at a later point.")
+parser.add_argument('root_directory', type=str, help="The directory containing exported NeoFinder files (txt).")
 
 
 def json_serial(obj):
@@ -28,7 +27,7 @@ def json_serial(obj):
     raise TypeError ("Type %s not serializable" % type(obj))
 
 
-def walk_file_system(current, root_path, target_index, output_directory):
+def walk_file_system(current, root_path, output_directory):
     global batch
     global counter
 
@@ -68,6 +67,14 @@ def walk_file_system(current, root_path, target_index, output_directory):
                             guess = None
                         if guess:
                             document["mime_type"] = guess.mime
+                    
+                    with open(f.path, "rb") as f:
+                        file_hash = hashlib.md5()
+
+                        while chunk := f.read():
+                            file_hash.update(chunk)
+
+                    document["md5"] = file_hash.hexdigest()
 
                 document["_id"] = relative_path
 
@@ -80,16 +87,14 @@ def walk_file_system(current, root_path, target_index, output_directory):
                     logging.error(f"Unknown FileNotFoundError: '{relative_path}'.")
 
         if len(batch) > 100000:
-            logging.info(f"...processed {counter}, pushing to index.")
-            if output_directory:
-                with open(f"{output_directory}/{counter}_files.json", 'w') as f:
-                    json.dump(batch, f, default=json_serial)
-            else:
-                open_search.push_batch(batch, target_index, output_directory)
+            logging.info(f"...processed {counter}, exporting to file.")
+            with open(f"{output_directory}/{counter}_files.json", 'w') as f:
+                json.dump(batch, f, default=json_serial)
+            
             batch = []
 
         for subdir in subdirs:
-            walk_file_system(subdir, root_dir, target_index, output_directory)
+            walk_file_system(subdir, root_dir, output_directory)
     except PermissionError:
         logging.error(f"Got PermissionError for '{current}', ignoring.")
 
@@ -101,35 +106,28 @@ if __name__ == '__main__':
     options = vars(parser.parse_args())
 
     root_dir = options['root_directory'].removesuffix("/")
-    target_index = os.path.basename(root_dir).lower()
+    input_dir_name = os.path.basename(root_dir).lower()
 
     logging.basicConfig(
-        filename=f'{output_helper.get_logging_dir()}/{target_index}_{date.today()}.log', 
+        filename=f'{output_helper.get_logging_dir()}/directory_{input_dir_name}_{date.today()}.log', 
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
         level=logging.INFO
     )
 
-    output_directory = None
-    if options['to_file']:
-        output_directory = f"{output_helper.get_output_base_dir()}/{target_index}_{date.today()}"
-        try:
-            os.mkdir(output_directory)
-        except FileExistsError:
-            logging.info(f"Output directory {output_directory} already exists.")
-    else:
-        open_search.create_index(target_index, options['clear'])
+    output_directory = f"{output_helper.get_output_base_dir()}/directory_{input_dir_name}_{date.today()}"
+    try:
+        os.mkdir(output_directory)
+    except FileExistsError:
+        logging.info(f"Output directory {output_directory} already exists.")
 
     logging.info(f"Scanning {root_dir}")
-    walk_file_system(root_dir, root_dir, target_index, output_directory)
+    walk_file_system(root_dir, root_dir, output_directory)
 
     if len(batch) > 0:
-        if output_directory:
-            with open(f"{output_directory}/{counter}_files.json", 'w') as f:
-                json.dump(batch, f, default=json_serial)
-        else:
-            open_search.push_batch(batch, target_index, output_directory)
-    logging.info(f"Processed {counter} overall.")
+        with open(f"{output_directory}/{counter}_files.json", 'w') as f:
+            json.dump(batch, f, default=json_serial)
 
+    logging.info(f"Processed {counter} overall.")
     logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")

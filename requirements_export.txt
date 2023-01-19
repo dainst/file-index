@@ -1,0 +1,2 @@
+dateparser==1.1.4
+filetype==1.2.0

@@ -45,9 +45,7 @@ faulty_lines = 0
 no_date = 0
 
 parser = argparse.ArgumentParser(description='Process NeoFinder export files.')
-parser.add_argument('root_directory', type=str, help="The directory containing exported NeoFinder files (txt). Its name will be used as the name for the target index.")
-parser.add_argument('--clear', action='store_true',  dest='clear', help="Clear existing search index if found, default: false.")
-parser.add_argument('--to-file', action='store_true', dest='to_file', help="Save result as JSON files, which can be indexed at a later point.")
+parser.add_argument('root_directory', type=str, help="The directory containing exported NeoFinder files (txt).")
 
 def standardize_headings(headings):
 
@@ -140,7 +138,7 @@ def process_values(values):
     return values
 
 
-def process_file(path, index_name, output_directory):
+def process_file(path, output_directory):
     global overall_lines
     global faulty_lines
 
@@ -177,12 +175,8 @@ def process_file(path, index_name, output_directory):
 
                 line_counter += 1
                 if len(batch) == batch_size:
-
-                    if output_directory:
-                        with open(f"{output_directory}/{os.path.basename(path)}_{line_counter}.json", 'w') as f:
-                            json.dump(batch, f, default=json_serial)
-                    else:
-                        open_search.push_batch(batch, index_name)
+                    with open(f"{output_directory}/{os.path.basename(path)}_{line_counter}.json", 'w') as f:
+                        json.dump(batch, f, default=json_serial)
                     batch = []
                     logging.info(f" ...processed {line_counter} rows.")
 
@@ -212,11 +206,8 @@ def process_file(path, index_name, output_directory):
 
         
         if len(batch) > 0:
-            if output_directory:
-                with open(f"{output_directory}/{os.path.basename(path)}_{line_counter}.json", 'w') as f:
-                    json.dump(batch, f, default=json_serial)
-            else:
-                open_search.push_batch(batch, index_name)
+            with open(f"{output_directory}/{os.path.basename(path)}_{line_counter}.json", 'w') as f:
+                json.dump(batch, f, default=json_serial)
 
             logging.info(f" ...processed {line_counter} rows.")
 
@@ -228,35 +219,28 @@ if __name__ == '__main__':
 
     start_time = time.time()
     root_path = options["root_directory"].removesuffix("/")
-    index_name = os.path.basename(root_path.lower())
+    input_dir_name = os.path.basename(root_path.lower())
 
     logging.basicConfig(
-        filename=f'{output_helper.get_logging_dir()}/{index_name}_{date.today()}.log', 
+        filename=f'{output_helper.get_logging_dir()}/{input_dir_name}_{date.today()}.log', 
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
         level=logging.INFO
     )
 
-
-    output_directory = None
-    if options["to_file"]:
-        output_directory = f"{output_helper.get_output_base_dir()}/{index_name}_{date.today()}"
-        try:
-            os.mkdir(output_directory)
-        except FileExistsError:
-            logging.info(f"Output directory {output_directory} already exists.")
-            
-    else:
-        open_search.create_index(index_name, options['clear'])
-
+    output_directory = f"{output_helper.get_output_base_dir()}/{input_dir_name}_{date.today()}"
+    try:
+        os.mkdir(output_directory)
+    except FileExistsError:
+        logging.info(f"Output directory {output_directory} already exists.")
 
     for f in os.scandir(root_path):
         if f.is_file() and f.name.endswith('.txt'):
             try:
                 logging.info(f"Processing file '{f.name}'.")
                 start_time_file = time.time()
-                process_file(f.path, index_name, output_directory)
+                process_file(f.path, output_directory)
                 logging.info(f"Processed file in {round(time.time() - start_time_file, 2)} seconds.\n")
             except Exception as e:
                 logging.error(f"Error when processing file '{f.name}'.")
@@ -264,7 +248,7 @@ if __name__ == '__main__':
                 logging.error("")
 
     logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
-    logging.info(f"Indexed {overall_lines} rows.")
-    logging.info(f"Indexed {no_date} rows without creation/modification date.")
+    logging.info(f"Exported {overall_lines} rows.")
+    logging.info(f"Exported {no_date} rows without creation/modification date.")
     if faulty_lines > 0:
         logging.warning(f"Encountered {faulty_lines} unfixable faulty rows, please check the input the CSV.")
