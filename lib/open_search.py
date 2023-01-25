@@ -120,6 +120,8 @@ def push_batch(docs, index_name):
         raise Exception(errors)
 
 def bytes_to_human_readable(number: int):
+    if number is None:
+        return f"Unknown"
     
     notations = ["B", "KB", "MB", "GB"]
 
