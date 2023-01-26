@@ -187,7 +187,14 @@ def process_file(path, output_directory):
                 sanitized = next_line.strip('\n')
                 logging.debug("Possible faulty new line in data row:")
                 logging.debug(f"'{sanitized}'")
-                next_line = f"{sanitized}{csv_file.readline()}"
+
+                preview_new_line = csv_file.readline()
+                if preview_new_line == "":
+                    logging.error("Unexpected end of file, last line was:")
+                    logging.error(sanitized)
+                    break
+
+                next_line = f"{sanitized}{preview_new_line}"
                 
                 logging.debug("Recombined with following line to:")
                 logging.debug(f"'{next_line.strip()}'")
@@ -226,7 +233,7 @@ if __name__ == '__main__':
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
-        level=logging.INFO
+        level=logging.DEBUG
     )
 
     output_directory = f"{output_helper.get_output_base_dir()}/{input_dir_name}_{date.today()}"
