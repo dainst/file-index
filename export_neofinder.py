@@ -233,7 +233,7 @@ if __name__ == '__main__':
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
-        level=logging.DEBUG
+        level=logging.INFO
     )
 
     output_directory = f"{output_helper.get_output_base_dir()}/{input_dir_name}_{date.today()}"
