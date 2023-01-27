@@ -4,7 +4,7 @@ import argparse
 import json
 import os
 import logging
-from lib import open_search
+from lib import open_search, output_helper
 import time
 
 parser = argparse.ArgumentParser(description='Index result files preprocessed by "index_neofinder.py" or "index_directory.py".')
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     root_path = options["root_directory"].removesuffix("/")
 
     logging.basicConfig(
-        filename=f'{index_name}_import_{date.today()}.log', 
+	filename=f'{output_helper.get_logging_dir()}/{index_name}_import_{date.today()}.log'
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
