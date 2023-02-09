@@ -154,11 +154,14 @@ def process_file(path, output_directory):
         batch = []
         found_first_data_row = False
         found_faulty_line = False
+
+        expect_two_values_next = False
+
         next_line = csv_file.readline()
         while(next_line):
-    
+
             values = next_line.split('\t')
-            if len(values) == len(headings):
+            if len(values) == len(headings) and not expect_two_values_next:
                 if found_faulty_line:
                     logging.debug("Faulty line fixed.\n")
                     found_faulty_line = False
@@ -184,6 +187,9 @@ def process_file(path, output_directory):
 
             elif len(values) < len(headings) and found_first_data_row and next_line != "":
 
+                if headings[len(values) - 2].strip() == "Beschreibung:":
+                    expect_two_values_next = True
+                    next_line.replace("\t", "", -1)
                 sanitized = next_line.strip('\n')
                 logging.debug("Possible faulty new line in data row:")
                 logging.debug(f"'{sanitized}'")
@@ -193,6 +199,13 @@ def process_file(path, output_directory):
                     logging.error("Unexpected end of file, last line was:")
                     logging.error(sanitized)
                     break
+
+
+                if len(values) == 2 and expect_two_values_next:
+                    preview_new_line = preview_new_line.replace("\t", "")
+                elif expect_two_values_next:
+                    preview_new_line = preview_new_line.replace("\t", "", 2).strip("\n")
+                    expect_two_values_next = False
 
                 next_line = f"{sanitized}{preview_new_line}"
                 
