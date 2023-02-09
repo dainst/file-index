@@ -10,7 +10,7 @@ import time
 import logging
 import json
 
-from lib import open_search, output_helper
+from lib import output_helper
 
 SIZE_PATTERN_PLAIN_BYTE_VALUE = r"^\d+$"
 SIZE_PATTERN_VARIANT_1 = r"^.+\(([\d\.]+) Bytes\)$" # "481,6 KB (481.631 Bytes)"
