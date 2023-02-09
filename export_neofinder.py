@@ -107,7 +107,7 @@ def process_values(values):
     values['neofinder_modified'] = values["modified"]
 
     if not modified_standardized and not created_standardized:
-        logging.debug(f" Neither creation nor modification date found for '{values['path']}'.")
+        #logging.debug(f" Neither creation nor modification date found for '{values['path']}'.")
         no_date += 1
 
     values["created"] = created_standardized
@@ -161,9 +161,13 @@ def process_file(path, output_directory):
         while(next_line):
 
             values = next_line.split('\t')
+
+            #logging.debug(f"{len(values)} <> {len(headings)}")
+            #logging.debug(values)
+            #logging.debug(next_line)
             if len(values) == len(headings) and not expect_two_values_next:
                 if found_faulty_line:
-                    logging.debug("Faulty line fixed.\n")
+                    #logging.debug("Faulty line fixed.\n")
                     found_faulty_line = False
 
                 found_first_data_row = True
@@ -188,11 +192,13 @@ def process_file(path, output_directory):
             elif len(values) < len(headings) and found_first_data_row and next_line != "":
 
                 if headings[len(values) - 2].strip() == "Beschreibung:":
+                    #logging.debug("Expecting two.")
                     expect_two_values_next = True
                     next_line.replace("\t", "", -1)
+
                 sanitized = next_line.strip('\n')
-                logging.debug("Possible faulty new line in data row:")
-                logging.debug(f"'{sanitized}'")
+                #logging.debug("Possible faulty new line in data row:")
+                #logging.debug(f"'{sanitized}'")
 
                 preview_new_line = csv_file.readline()
                 if preview_new_line == "":
@@ -204,13 +210,15 @@ def process_file(path, output_directory):
                 if len(values) == 2 and expect_two_values_next:
                     preview_new_line = preview_new_line.replace("\t", "")
                 elif expect_two_values_next:
+                    #logging.debug(preview_new_line)
                     preview_new_line = preview_new_line.replace("\t", "", 2).strip("\n")
+                    #logging.debug(preview_new_line)
                     expect_two_values_next = False
 
                 next_line = f"{sanitized}{preview_new_line}"
                 
-                logging.debug("Recombined with following line to:")
-                logging.debug(f"'{next_line.strip()}'")
+                #logging.debug("Recombined with following line to:")
+                #logging.debug(f"'{next_line}'")
 
                 found_faulty_line = True
 
