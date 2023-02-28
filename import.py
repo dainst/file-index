@@ -29,6 +29,8 @@ if __name__ == '__main__':
         level=logging.INFO
     )
 
+    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
     open_search.create_index(index_name, options['clear'])
 
     for f in os.scandir(root_path):

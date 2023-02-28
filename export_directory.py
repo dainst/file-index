@@ -116,6 +116,8 @@ if __name__ == '__main__':
         level=logging.INFO
     )
 
+    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
     output_directory = f"{output_helper.get_output_base_dir()}/directory_{input_dir_name}_{date.today()}"
     try:
         os.mkdir(output_directory)
