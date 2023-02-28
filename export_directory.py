@@ -131,5 +131,6 @@ if __name__ == '__main__':
         with open(f"{output_directory}/{counter}_files.json", 'w') as f:
             json.dump(batch, f, default=json_serial)
 
-    logging.info(f"Processed {counter} overall.")
+    logging.info("####################################################################################")
     logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
+    logging.info(f"Processed files {counter} overall.")
