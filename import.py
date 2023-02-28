@@ -22,7 +22,7 @@ if __name__ == '__main__':
     root_path = options["root_directory"].removesuffix("/")
 
     logging.basicConfig(
-	filename=f'{output_helper.get_logging_dir()}/{index_name}_import_{date.today()}.log'
+	filename=f'{output_helper.get_logging_dir()}/{index_name}_import_{date.today()}.log',
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
