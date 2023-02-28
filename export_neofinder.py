@@ -237,8 +237,7 @@ def process_file(path, output_directory):
             with open(f"{output_directory}/{os.path.basename(path)}_{line_counter}.json", 'w') as f:
                 json.dump(batch, f, default=json_serial)
 
-            logging.info(f" ...processed {line_counter} rows.")
-
+        logging.info(f"Finished processing {path}, processed {line_counter} rows.")
         overall_lines += line_counter
 
 if __name__ == '__main__':
@@ -265,20 +264,33 @@ if __name__ == '__main__':
     except FileExistsError:
         logging.info(f"Output directory {output_directory} already exists.")
 
+    file_list = []
     for f in os.scandir(root_path):
         if f.is_file() and f.name.endswith('.txt'):
-            try:
-                logging.info(f"Processing file '{f.name}'.")
-                start_time_file = time.time()
-                process_file(f.path, output_directory)
-                logging.info(f"Processed file in {round(time.time() - start_time_file, 2)} seconds.\n")
-            except Exception as e:
-                logging.error(f"Error when processing file '{f.name}'.")
-                logging.error(e)
-                logging.error("")
+            file_list.append(f)
+
+    sorted(file_list, key=lambda e: e.name)
+
+    logging.info("Found the following files:")
+    for f in file_list:
+        logging.info(f.path)
+
+    file_counter = 0
+    for f in file_list:
+        try:
+            logging.info(f"Processing file '{f.name}'.")
+            start_time_file = time.time()
+            process_file(f.path, output_directory)
+            logging.info(f"Processed file in {round(time.time() - start_time_file, 2)} seconds.\n")
+        except Exception as e:
+            logging.error(f"Error when processing file '{f.name}'.")
+            logging.error(e)
+            logging.error("")
+        
+        file_counter += 1
 
     logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
-    logging.info(f"Exported {overall_lines} rows.")
+    logging.info(f"Processed {file_counter} input files with exported {overall_lines} rows.")
     logging.info(f"Exported {no_date} rows without creation/modification date.")
     if faulty_lines > 0:
         logging.warning(f"Encountered {faulty_lines} unfixable faulty rows, please check the input the CSV.")
