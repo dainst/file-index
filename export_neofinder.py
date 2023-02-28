@@ -237,7 +237,7 @@ def process_file(path, output_directory):
             with open(f"{output_directory}/{os.path.basename(path)}_{line_counter}.json", 'w') as f:
                 json.dump(batch, f, default=json_serial)
 
-        logging.info(f"Finished processing {path}, processed {line_counter} rows.")
+        logging.info(f"Finished processing '{path}', processed {line_counter} rows.")
         overall_lines += line_counter
 
 if __name__ == '__main__':
@@ -289,8 +289,9 @@ if __name__ == '__main__':
         
         file_counter += 1
 
+    logging.info("####################################################################################")
     logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
-    logging.info(f"Processed {file_counter} input files with exported {overall_lines} rows.")
-    logging.info(f"Exported {no_date} rows without creation/modification date.")
+    logging.info(f"  Processed {file_counter} input files with {overall_lines} rows.")
+    logging.info(f"  Exported {no_date} rows without creation/modification date.")
     if faulty_lines > 0:
-        logging.warning(f"Encountered {faulty_lines} unfixable faulty rows, please check the input the CSV.")
+        logging.warning(f"  Encountered {faulty_lines} unfixable faulty rows, please check the input the CSV.")
