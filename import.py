@@ -3,6 +3,7 @@ from datetime import date, datetime
 import argparse
 import json
 import os
+import sys
 import logging
 from lib import open_search, output_helper
 import time
