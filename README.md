@@ -1,17 +1,18 @@
+This repository contains three scripts for indexing file information in [OpenSearch](https://opensearch.org/).
+
 # Prerequisites
 
 * Python > 3.8
 * Docker and docker-compose (if you want to run OpenSearch Dashboards locally)
 
-# Setup
+## Setup
 
 Install python dependencies
 
+```bash
+pip3 install -r requirements_import.txt # required for export_directory.py and export_neofinder.py 
+pip3 install -r requirements_export.txt # required for import.py
 ```
-pip3 install -r requirements.txt
-```
-
-Create a new `.env` file based on the template
 
 ```
 cp .env_template .env
@@ -19,30 +20,71 @@ cp .env_template .env
 
 Adjust the `.env` file for your setup. The scripts read the connection info for the search index from the file.
 
-# Import Script Usage
+# Usage
+
+There are three main scripts
+* `export_directory.py`
+* `export_neofinder.py`
+* `import.py`
+
+The first to create JSON objects that can be imported using the third script.
+
+## Processing file system data
+
+In order to recursively scan a directory and transform file and directory information into JSON run:
 
 ```
-python3 index_directory.py <path to root directory>
+python3 export_directory.py <path to your directory>
 ```
 
-The above command will (re-)create an index with the name of the root directory, process all files and subdirectories and push their data to the created index.
+## Processing NeoFinder exports
+
+In order to transform NeoFinder exports (txt files that are basically csv) into JSON run:
 
 ```
-python3 index_neofinder.py <path to directory containing neofinder exports>
+python3 export_neofinder.py <path to directory containing neofinder export txts>
 ```
 
-The above command will (re-)create an index with the name of the provided directory, process all `txt` files it finds within (ignoring subdirectories) and push their data to the created index.
+## Importing into OpenSearch
+
+Both scripts above will produce the following results:
+* a log of the export in [log](log).
+* a directory JSON files in [output](output).
+
+The `import.py` will read the URL and credentials for your OpenSearch installation from the `.env` file you created in the setup above.
 
 ```
-python index_preprocessed.py <path to directory containing preprocessed files>
+python3 import.py <opensearch index for your data> <path to your JSON directory> 
 ```
 
-The above script will index preprocessed data created by the other two python scripts if they have been run using the `--to-file` option.
+By default, the script will add or update data if the specified index already exists in OpenSearch. If the index does not exist, the script will create a new one.
 
-# Running local OpenSearch
+If you want to delete the existing index before importing, you may run the script with the `--clear` option.
+
+```
+python3 import.py <opensearch index for your data> <path to your JSON directory> --clear
+```
+
+# Running OpenSearch
+
+## Locally
+
+If you want to run a local installation of OpenSearch, you can start one with.
 
 ```
 docker-compose up
 ```
 
 This will run OpenSearch on port 9200 and OpenSearch Dashboards on port 5601 locally.
+
+The default credentials are admin:admin, which should also be reflected in your `.env` file before running `import.py`.
+
+## Deployment
+__You should not run OpenSearch/OpenSearch Dashboards with the default credentials.__ See the official [documentation](https://opensearch.org/docs/latest/security/authentication-backends/authc-index/). 
+Set your `.env` file according to your domain and updated credentials. 
+
+Start OpenSearch, OpenSearchDashboards and Traefik (for TLS) with:
+```
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
