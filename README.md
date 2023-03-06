@@ -10,8 +10,8 @@ This repository contains three scripts for indexing file information in [OpenSea
 Install python dependencies
 
 ```bash
-pip3 install -r requirements_import.txt # required for export_directory.py and export_neofinder.py 
-pip3 install -r requirements_export.txt # required for import.py
+pip3 install -r requirements_export.txt # required for export_directory.py and export_neofinder.py 
+pip3 install -r requirements_import.txt # required for import.py
 ```
 
 ```
