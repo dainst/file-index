@@ -18,7 +18,7 @@ pip3 install -r requirements_export.txt # required for import.py
 cp .env_template .env
 ```
 
-Adjust the `.env` file for your setup. The scripts read the connection info for the search index from the file.
+Adjust the `.env` file for your setup, the scripts read the connection info for the OpenSearch from this file.
 
 # Usage
 
