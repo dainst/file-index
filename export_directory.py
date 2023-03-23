@@ -1,6 +1,5 @@
 from datetime import datetime, timezone, date
 import os
-import requests
 import sys
 import filetype
 import mimetypes
