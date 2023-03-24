@@ -17,6 +17,9 @@ counter = 0
 parser = argparse.ArgumentParser(description='Process file system tree.')
 parser.add_argument('root_directory', type=str, help="The directory containing exported NeoFinder files (txt).")
 
+# ptifs are not a default and otherwise will require filetype.guess which is much slower because it will
+# open the file and decide by contents.
+mimetypes.add_type("image/tiff", ".ptif")
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
