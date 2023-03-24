@@ -248,8 +248,10 @@ if __name__ == '__main__':
     root_path = options["root_directory"].removesuffix("/")
     input_dir_name = os.path.basename(root_path.lower())
 
+    now = datetime.now().strftime("%Y-%d-%m_%H:%M:%S")
+
     logging.basicConfig(
-        filename=f'{output_helper.get_logging_dir()}/{input_dir_name}_{date.today()}.log', 
+        filename=f'{output_helper.get_logging_dir()}/{input_dir_name}_{now}.log', 
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
@@ -258,7 +260,7 @@ if __name__ == '__main__':
 
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-    output_directory = f"{output_helper.get_output_base_dir()}/{input_dir_name}_{date.today()}"
+    output_directory = f"{output_helper.get_output_base_dir()}/{input_dir_name}_{now}"
     try:
         os.mkdir(output_directory)
     except FileExistsError:
