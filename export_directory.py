@@ -67,13 +67,13 @@ def walk_file_system(current, root_path, output_directory):
                         if guess:
                             document["mime_type"] = guess.mime
                     
-                    with open(f.path, "rb") as f:
-                        file_hash = hashlib.md5()
+                    # with open(f.path, "rb") as f:
+                    #     file_hash = hashlib.md5()
 
-                        while chunk := f.read():
-                            file_hash.update(chunk)
+                    #     while chunk := f.read():
+                    #         file_hash.update(chunk)
 
-                    document["md5"] = file_hash.hexdigest()
+                    # document["md5"] = file_hash.hexdigest()
 
                 document["_id"] = relative_path
 
