@@ -116,8 +116,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-
-    now = datetime.now().strftime("%Y-%d-%m_%H:%M:%S")
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     options = vars(parser.parse_args())
 

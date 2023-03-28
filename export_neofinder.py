@@ -248,7 +248,7 @@ if __name__ == '__main__':
     root_path = options["root_directory"].removesuffix("/")
     input_dir_name = os.path.basename(root_path.lower())
 
-    now = datetime.now().strftime("%Y-%d-%m_%H:%M:%S")
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     logging.basicConfig(
         filename=f'{output_helper.get_logging_dir()}/{input_dir_name}_{now}.log', 
