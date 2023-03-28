@@ -47,10 +47,21 @@ def walk_file_system(current, root_path, output_directory):
                 stats = f.stat()
 
                 document['size_bytes'] = stats.st_size
-                document['modified'] = datetime.fromtimestamp(
-                    stats.st_mtime, tz=timezone.utc)
-                document['created'] = datetime.fromtimestamp(
-                    stats.st_ctime, tz=timezone.utc)
+                
+                document['modified'] = None
+                document['created'] = None
+
+                try:
+                    document['modified'] = datetime.fromtimestamp(
+                        stats.st_mtime, tz=timezone.utc)
+                except:
+                    logging.error(f"Unable to parse modified date {stats.st_time} for {f.path}.")
+
+                try:
+                    document['created'] = datetime.fromtimestamp(
+                        stats.st_ctime, tz=timezone.utc)
+                except:
+                    logging.error(f"Unable to parse creation date {stats.st_ctime} for {f.path}.")
 
                 if f.is_dir():
                     subdirs.append(f.path)
