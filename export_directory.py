@@ -47,7 +47,7 @@ def walk_file_system(current, root_path, output_directory):
                 stats = f.stat()
 
                 document['size_bytes'] = stats.st_size
-                
+
                 document['modified'] = None
                 document['created'] = None
 
@@ -55,7 +55,7 @@ def walk_file_system(current, root_path, output_directory):
                     document['modified'] = datetime.fromtimestamp(
                         stats.st_mtime, tz=timezone.utc)
                 except:
-                    logging.error(f"Unable to parse modified date {stats.st_time} for {f.path}.")
+                    logging.error(f"Unable to parse modified date {stats.st_mtime} for {f.path}.")
 
                 try:
                     document['created'] = datetime.fromtimestamp(
