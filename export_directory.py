@@ -78,6 +78,10 @@ def walk_file_system(current, root_path, output_directory):
                             guess = filetype.guess(f.path)
                         except PermissionError:
                             guess = None
+                        except OSError as e:
+                            logging.error(f"Got exception for {f.path}.")
+                            logging.error(e)
+                            guess = None
                         if guess:
                             document["mime_type"] = guess.mime
                     
