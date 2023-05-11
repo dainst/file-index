@@ -115,41 +115,44 @@ def walk_file_system(current, root_path, output_directory):
     except PermissionError:
         logging.error(f"Got PermissionError for '{current}', ignoring.")
 
+try:
+    if __name__ == '__main__':
 
-if __name__ == '__main__':
+        start_time = time.time()
 
-    start_time = time.time()
+        now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        options = vars(parser.parse_args())
 
-    options = vars(parser.parse_args())
+        root_dir = options['root_directory'].removesuffix("/")
+        input_dir_name = os.path.basename(root_dir).lower()
 
-    root_dir = options['root_directory'].removesuffix("/")
-    input_dir_name = os.path.basename(root_dir).lower()
+        logging.basicConfig(
+            filename=f'{output_helper.get_logging_dir()}/directory_{input_dir_name}_{now}.log', 
+            filemode='w',
+            encoding='utf-8',
+            format='%(asctime)s|%(levelname)s: %(message)s',
+            level=logging.INFO
+        )
 
-    logging.basicConfig(
-        filename=f'{output_helper.get_logging_dir()}/directory_{input_dir_name}_{now}.log', 
-        filemode='w',
-        encoding='utf-8',
-        format='%(asctime)s|%(levelname)s: %(message)s',
-        level=logging.INFO
-    )
+        logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-    logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+        output_directory = f"{output_helper.get_output_base_dir()}/directory_{input_dir_name}_{now}"
+        try:
+            os.mkdir(output_directory)
+        except FileExistsError:
+            logging.info(f"Output directory {output_directory} already exists.")
 
-    output_directory = f"{output_helper.get_output_base_dir()}/directory_{input_dir_name}_{now}"
-    try:
-        os.mkdir(output_directory)
-    except FileExistsError:
-        logging.info(f"Output directory {output_directory} already exists.")
+        logging.info(f"Scanning {root_dir}")
+        walk_file_system(root_dir, root_dir, output_directory)
 
-    logging.info(f"Scanning {root_dir}")
-    walk_file_system(root_dir, root_dir, output_directory)
+        if len(batch) > 0:
+            with open(f"{output_directory}/{counter}_files.json", 'w') as f:
+                json.dump(batch, f, default=json_serial)
 
-    if len(batch) > 0:
-        with open(f"{output_directory}/{counter}_files.json", 'w') as f:
-            json.dump(batch, f, default=json_serial)
-
-    logging.info("####################################################################################")
-    logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
-    logging.info(f"Processed files {counter} overall.")
+        logging.info("####################################################################################")
+        logging.info(f"Finished after {round(time.time() - start_time, 2)} seconds.")
+        logging.info(f"Processed files {counter} overall.")
+except Exception as e:
+    logging.error("Encountered unhandled exception")
+    logging.error(e)
