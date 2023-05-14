@@ -27,7 +27,7 @@ There are three main scripts
 * `export_neofinder.py`
 * `import.py`
 
-The first to create JSON objects that can be imported using the third script.
+The first two create JSON objects that can be imported using the third script.
 
 ## Processing file system data
 
