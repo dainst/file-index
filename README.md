@@ -83,7 +83,7 @@ The default credentials are admin:admin, which should also be reflected in your 
 __You should not run OpenSearch/OpenSearch Dashboards with the default credentials.__ See the official [documentation](https://opensearch.org/docs/latest/security/authentication-backends/authc-index/). 
 Set your `.env` file according to your domain and updated credentials. 
 
-Start OpenSearch, OpenSearchDashboards and Traefik (for TLS) with:
+Start OpenSearch, OpenSearchDashboards and Traefik with:
 ```
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
