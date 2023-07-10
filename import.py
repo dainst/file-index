@@ -22,8 +22,10 @@ if __name__ == '__main__':
     index_name = options["index_name"]
     root_path = options["root_directory"].removesuffix("/")
 
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
     logging.basicConfig(
-	filename=f'{output_helper.get_logging_dir()}/{index_name}_import_{date.today()}.log',
+	    filename=f'{output_helper.get_logging_dir()}/{index_name}_import_{now}.log',
         filemode='w',
         encoding='utf-8',
         format='%(asctime)s|%(levelname)s: %(message)s',
