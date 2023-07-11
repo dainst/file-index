@@ -114,6 +114,9 @@ def walk_file_system(current, root_path, output_directory):
             walk_file_system(subdir, root_dir, output_directory)
     except PermissionError:
         logging.error(f"Got PermissionError for '{current}', ignoring.")
+    except FileNotFoundError as e:
+        logging.error(e)
+        logging.error(f"Got a FileNotFoundError while processing the directory '{current}'. Maybe a directory or file got moved while processing?")
 
 try:
     if __name__ == '__main__':
