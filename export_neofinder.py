@@ -38,7 +38,7 @@ OPTIONAL_HEADINGS = ["media_info"]
 
 DIRECTORY_VARIANTS = ["Ordner"]
 
-DATE_FORMATS = ["%d.%m.%Y", "%d. %A %Y um %H:%M"]
+DATE_FORMATS = ["%Y-%m-%d %H:%M:%S", "%d.%m.%Y", "%d. %A %Y um %H:%M"]
 
 overall_lines = 0
 faulty_lines = 0
