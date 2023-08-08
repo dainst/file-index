@@ -117,7 +117,8 @@ def push_batch(docs, index_name):
     )
 
     if successes != len(docs):
-        raise Exception(errors)
+        logging.error(f"Got {len(errors)} while bulk indexing {len(docs)} documents:")
+        logging.error(errors)
 
 def bytes_to_human_readable(number: int):
     if number is None:
