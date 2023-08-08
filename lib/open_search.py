@@ -110,15 +110,18 @@ def push_batch(docs, index_name):
             '_id': _id,
             '_source': dict(sorted(doc.items()))
         })
-    
-    (successes, errors) = helpers.bulk(
-        client,
-        data
-    )
 
-    if successes != len(docs):
-        logging.error(f"Got {len(errors)} while bulk indexing {len(docs)} documents:")
-        logging.error(errors)
+    try: 
+        (successes, errors) = helpers.bulk(
+            client,
+            data
+        )
+
+        if successes != len(docs):
+            raise Exception(errors)
+    except Exception as e:
+        logging.error(f"Exception while running bulk import:")
+        logging.error(e)
 
 def bytes_to_human_readable(number: int):
     if number is None:
