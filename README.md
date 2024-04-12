@@ -49,7 +49,7 @@ python3 export_neofinder.py <path to directory containing neofinder export txts>
 
 Both scripts above will produce the following results:
 * a log of the export in [log](log).
-* a directory JSON files in [output](output).
+* a directory of JSON files in [output](output).
 
 The `import.py` will read the URL and credentials for your OpenSearch installation from the `.env` file you created in the setup above.
 
