@@ -80,7 +80,7 @@ This will run OpenSearch on port 9200 and OpenSearch Dashboards on port 5601 loc
 The default credentials are admin:admin, which should also be reflected in your `.env` file before running `import.py`.
 
 ## Deployment
-__You should not run OpenSearch/OpenSearch Dashboards with the default credentials.__ See the official [documentation](https://opensearch.org/docs/latest/security/authentication-backends/authc-index/). 
+__You should not run OpenSearch/OpenSearch Dashboards with the default credentials.__ See the official [documentation](https://opensearch.org/docs/2.4/security/authentication-backends/authc-index/). 
 Set your `.env` file according to your domain and updated credentials. 
 
 Start OpenSearch, OpenSearchDashboards and Traefik with:
