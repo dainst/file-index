@@ -1,13 +1,13 @@
-version: "3"
 services:
   opensearch:
-    image: opensearchproject/opensearch:2.4.0
+    image: opensearchproject/opensearch:2.19.1
     container_name: file-index-opensearch
     environment:
       - discovery.type=single-node
       - plugins.security.ssl.http.enabled=false
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${FILE_INDEX_PASSWORD}
     ulimits:
       memlock:
         soft: -1
@@ -21,11 +21,9 @@ services:
       - 9200:9200
       - 9600:9600 # required for Performance Analyzer
   opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:2.4.0
+    image: opensearchproject/opensearch-dashboards:2.19.1
     container_name: file-index-opensearch-dashboards
     ports:
       - 5601:5601
     environment:
       OPENSEARCH_HOSTS: '["http://file-index-opensearch:9200"]'
-      OPENSEARCH_PASSWORD: ${FILE_INDEX_PASSWORD}
-      OPENSEARCH_USERNAME: ${FILE_INDEX_USER}

@@ -1,9 +1,8 @@
-version: "3"
 services:
   opensearch:
     labels:
       - traefik.enable=true
-      - traefik.http.routers.search.rule=Host(`search.${HOST}`)        
+      - traefik.http.routers.search.rule=Host(`search.${HOST}`)
       - traefik.http.services.search.loadbalancer.server.port=9200
     environment:
       - "OPENSEARCH_JAVA_OPTS=-Xms8g -Xmx8g" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
@@ -14,7 +13,7 @@ services:
   opensearch-dashboards:
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dashboards.rule=Host(`${HOST}`)        
+      - traefik.http.routers.dashboards.rule=Host(`${HOST}`)
       - traefik.http.services.dashboards.loadbalancer.server.port=5601
     restart: always
 
