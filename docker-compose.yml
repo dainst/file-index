@@ -27,3 +27,5 @@ services:
       - 5601:5601
     environment:
       OPENSEARCH_HOSTS: '["http://file-index-opensearch:9200"]'
+      OPENSEARCH_PASSWORD: ${FILE_INDEX_PASSWORD}
+      OPENSEARCH_USERNAME: ${FILE_INDEX_USER}
