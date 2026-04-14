@@ -138,7 +138,7 @@ try:
         input_dir_name = os.path.basename(root_dir).lower()
 
         logging.basicConfig(
-            filename=f"{output_helper.get_logging_dir()}/directory_{input_dir_name}_{now}.log",
+            filename=f"{output_helper.get_logging_dir()}/{input_dir_name}/directory_{input_dir_name}_{now}.log",
             filemode="w",
             encoding="utf-8",
             format="%(asctime)s|%(levelname)s: %(message)s",
@@ -148,10 +148,10 @@ try:
         logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
         output_directory = (
-            f"{output_helper.get_output_base_dir()}/directory_{input_dir_name}_{now}"
+            f"{output_helper.get_output_base_dir()}/{input_dir_name}/directory_{input_dir_name}_{now}"
         )
         try:
-            os.mkdir(output_directory)
+            os.makedirs(output_directory)
         except FileExistsError:
             logging.info(f"Output directory {output_directory} already exists.")
 
