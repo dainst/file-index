@@ -1,10 +1,10 @@
 import os
 
-def get_logging_dir():
-    return create('log')
+def get_logging_dir(target_directory=""):
+    return create(f'log/{target_directory}')
 
-def get_output_base_dir():
-    return create('output')
+def get_output_base_dir(target_directory=""):
+    return create(f'output/{target_directory}')
 
 def create(path):
 
