@@ -9,7 +9,7 @@ def get_output_base_dir(target_directory=""):
 def create(path):
 
     try:
-        os.mkdir(path)
+        os.makedirs(path)
     except:
         pass
 
