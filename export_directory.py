@@ -16,12 +16,15 @@ counter = 0
 
 zero_byte_file_paths = []
 
-parser = argparse.ArgumentParser(description="Process file system tree.")
+tivoli_output_flag = False
+
+parser = argparse.ArgumentParser(description="Walks a file system tree and generates standardized JSON metadata to be indexed in OpenSearch.")
 parser.add_argument(
     "root_directory",
     type=str,
     help="The directory containing exported NeoFinder files (txt).",
 )
+parser.add_argument("--tivoli", dest="tivoli", action="store_true", help="If set the script will add additional fields that are normally only part of the output `export_neofinder.py` produces. It will also use different names for the output directories and log files.")
 
 mimetypes.add_type("image/tiff", ".ptif")
 
@@ -36,6 +39,7 @@ def walk_file_system(current, root_path, output_directory):
     global batch
     global counter
     global zero_byte_file_paths
+    global tivoli_output_flag
 
     subdirs = []
     try:
@@ -48,6 +52,12 @@ def walk_file_system(current, root_path, output_directory):
                 "modified": None,
                 "created": None,
             }
+
+            if tivoli_output_flag:
+                base_directory = os.path.basename(root_path)
+
+                document["neofinder_catalog"] = base_directory
+                document["neofinder_volume"] = base_directory
 
             try:
                 stats = f.stat()
@@ -135,10 +145,16 @@ try:
         options = vars(parser.parse_args())
 
         root_dir = options["root_directory"].removesuffix("/")
+        tivoli_output_flag = options["tivoli"]
         input_dir_name = os.path.basename(root_dir).lower()
 
+        if tivoli_output_flag:
+            log_output =   f"{output_helper.get_logging_dir(input_dir_name)}/directory_{input_dir_name}_{now}.log"
+        else:
+            log_output = f"{output_helper.get_logging_dir(input_dir_name)}/tivoli_{input_dir_name}_{now}.log"
+
         logging.basicConfig(
-            filename=f"{output_helper.get_logging_dir(input_dir_name)}/directory_{input_dir_name}_{now}.log",
+            filename=log_output,
             filemode="w",
             encoding="utf-8",
             format="%(asctime)s|%(levelname)s: %(message)s",
@@ -147,9 +163,11 @@ try:
 
         logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-        output_directory = (
-            f"{output_helper.get_output_base_dir(input_dir_name)}/directory_{input_dir_name}_{now}"
-        )
+        if tivoli_output_flag:
+            output_directory = f"{output_helper.get_output_base_dir(input_dir_name)}/tivoli_{input_dir_name}_{now}"
+        else:
+            output_directory = f"{output_helper.get_output_base_dir(input_dir_name)}/directory_{input_dir_name}_{now}"
+
         try:
             os.makedirs(output_directory)
         except FileExistsError:
