@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import json
 import logging
 import mimetypes
@@ -82,7 +83,7 @@ def walk_file_system(current, root_path, output_directory):
                         f"Unable to parse creation date {stats.st_ctime} for {f.path}."
                     )
 
-                document["_id"] = relative_path
+                document["_id"] = hashlib.sha256(relative_path.encode()).hexdigest()
 
                 if f.is_dir():
                     subdirs.append(f.path)
