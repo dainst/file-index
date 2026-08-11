@@ -56,8 +56,8 @@ def walk_file_system(current, root_path, output_directory):
             if tivoli_output_flag:
                 base_directory = os.path.basename(root_path)
 
-                document["neofinder_catalog"] = base_directory
-                document["neofinder_volume"] = base_directory
+                document["archive_package_creation_date"] = base_directory
+                document["archive_package"] = base_directory
 
             try:
                 stats = f.stat()

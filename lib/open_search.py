@@ -75,6 +75,12 @@ def create_index(index_name, clear=False):
                     "size_bytes": {
                         "type": "long"
                     },
+                    "archive_package": {
+                        "type": "keyword"
+                    },
+                    "archive_package_creation_date": {
+                        "type": "date"
+                    }
                 }
             }
         }
