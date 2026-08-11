@@ -78,7 +78,7 @@ def create_index(index_name, clear=False):
                     "archive_package": {
                         "type": "keyword"
                     },
-                    "archive_package_creation_date": {
+                    "archived": {
                         "type": "date"
                     }
                 }

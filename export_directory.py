@@ -58,7 +58,7 @@ def walk_file_system(current, root_path, output_directory):
             if tivoli_output_flag:
                 base_directory = os.path.basename(root_path)
 
-                document["archive_package_creation_date"] = base_directory
+                document["archived"] = base_directory
                 document["archive_package"] = base_directory
 
             try:
