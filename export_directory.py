@@ -149,9 +149,9 @@ try:
         input_dir_name = os.path.basename(root_dir).lower()
 
         if tivoli_output_flag:
-            log_output =   f"{output_helper.get_logging_dir(input_dir_name)}/directory_{input_dir_name}_{now}.log"
-        else:
             log_output = f"{output_helper.get_logging_dir(input_dir_name)}/tivoli_{input_dir_name}_{now}.log"
+        else:
+            log_output = f"{output_helper.get_logging_dir(input_dir_name)}/directory_{input_dir_name}_{now}.log"
 
         logging.basicConfig(
             filename=log_output,
