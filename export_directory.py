@@ -49,6 +49,7 @@ def walk_file_system(current, root_path, output_directory):
             document = {
                 "name": f.name,
                 "path": relative_path,
+                "root": os.path.abspath(root_path),
                 "size_bytes": None,
                 "modified": None,
                 "created": None,
